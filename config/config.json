@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": null,
-    "database": "web_phone",
+    "password": "tainguyen050403",
+    "database": "Web_sale_final",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

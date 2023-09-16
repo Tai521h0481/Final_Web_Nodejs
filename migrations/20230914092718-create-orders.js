@@ -26,6 +26,12 @@ module.exports = {
       TotalAmount: {
         type: Sequelize.FLOAT
       },
+      AmountPaidByCustomer: {
+        type: Sequelize.FLOAT
+      },
+      ChangeReturnedToCustomer: {
+        type: Sequelize.FLOAT
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

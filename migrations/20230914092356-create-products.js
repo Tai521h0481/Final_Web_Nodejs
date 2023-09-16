@@ -16,10 +16,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       ImportPrice: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       RetailPrice: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       Category: {
         type: Sequelize.STRING

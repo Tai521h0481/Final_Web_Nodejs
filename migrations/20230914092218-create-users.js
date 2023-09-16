@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      Username: {
+      Email: {
         type: Sequelize.STRING
       },
       Password: {
@@ -18,17 +18,20 @@ module.exports = {
       Fullname: {
         type: Sequelize.STRING
       },
-      Email: {
-        type: Sequelize.STRING
-      },
       Role: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        defaultValue: 'Employee'
       },
       Profile_Picture: {
         type: Sequelize.STRING
       },
       IsActive: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      IsLocked: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
