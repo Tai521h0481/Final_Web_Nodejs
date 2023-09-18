@@ -20,7 +20,7 @@ module.exports = {
       },
       Role: {
         type: Sequelize.STRING,
-        defaultValue: 'Employee'
+        defaultValue: 'employee'
       },
       Profile_Picture: {
         type: Sequelize.STRING
