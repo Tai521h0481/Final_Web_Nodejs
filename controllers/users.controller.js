@@ -41,7 +41,7 @@ const getUserById = async (req, res) => {
     }
 }
 
-const sendEmail = (Email, res) => {
+const sendEmail = (Email) => {
     Email = Email.toLowerCase();
     const token = jwt.sign({ Email }, SECRET_key, { expiresIn: '1m' }); // Token expires in 1 minute
     linkLogin += `?token=${token}`;
@@ -51,22 +51,24 @@ const sendEmail = (Email, res) => {
         subject: 'Welcome to Our App',
         text: `Please click the link to login: ${linkLogin}`
     };
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            res.status(500).json({ message: error.message });
-        } else {
-            res.status(200).json({ message: "Email sent" });
-        }
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                reject(error.message);
+            } else {
+                resolve("Email sent");
+            }
+        });
     });
-    return;
 }
 
 const resendEmail = async (req, res) => {
     let Email = req.body.Email || req.query.Email || req.params.Email;
     try {
-        sendEmail(Email, res);
+        const message = await sendEmail(Email);
+        res.status(200).json({ message });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error });
     }
 }
 
@@ -76,51 +78,40 @@ const createUser = async (req, res) => {
         Email = Email.toLowerCase();
         const Password = Email.split('@')[0];
         Profile_Picture = gravatar.url(Email, { s: avatarSize, r: 'x', d: 'retro' }, true);
-        await Users.create({ Fullname, Email, Password, Profile_Picture });
-        sendEmail(Email, res);
+        const user = await Users.create({ Fullname, Email, Password, Profile_Picture });
+        const message = await sendEmail(Email);
+        user.Password = undefined;
+        res.status(200).json({ message, user });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
-
-const getToken = async (Email, Password) => {
-    const user = await Users.findOne({ Email: Email });
-    if (user && user.Password === Password) {
-        user.IsOnline = true;
-        await user.save();
-        const userObject = user.toObject();
-        delete userObject.Password;
-        const token = jwt.sign({ data: userObject }, SECRET_key, { expiresIn });
-        return token;
-    }
-    return null;
 }
 
 const login = async (req, res) => {
     let { Email, Password } = req.body;
     try {
         Email = Email.toLowerCase();
-        const token = await getToken(Email, Password);
-        if (token) {
-            const user = await Users.findOne({ Email: Email }).select('-Password');
-            user.IsActive = true;
-            res.cookie('token', token, { maxAge: timeToken });
-            res.status(200).json({ user, token });
-        } else {
+        const user = await Users.findOneAndUpdate({ Email, Password}, {IsOnline: true}, {new: true}).select('-Password');
+        if(!user){
             res.status(401).json({ message: 'Email or password is incorrect' });
+            return;
         }
+        const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
+        res.cookie('token', token, { maxAge: timeToken });
+        res.status(200).json({ user, token });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
-
 
 const upLoadAvatar = async (req, res) => {
     const { file } = req;
     const urlImg = `http://localhost:3000/${file.path}`;
     const id = req.params.id || req.body.id || req.query.id;
     try {
-        await Users.findByIdAndUpdate(id, { Profile_Picture: urlImg }, { new: true });
+        const user = await Users.findByIdAndUpdate(id, { Profile_Picture: urlImg }, { new: true }).select('-Password');
+        const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
+        res.cookie('token', token, { maxAge: timeToken });
         res.status(200).send({ message: `Upload avatar successfully` });
     }
     catch (error) {
@@ -132,14 +123,16 @@ const logout_removeCookie = async (req, res) => {
     const token = req.headers.token || req.body.token || req.query.token || req.cookies?.token;
     try {
         if (!token) {
-            res.status(401).json({ message: 'Token is required' });
+            res.status(401).json({ message: 'You have to login before' });
         } else {
             const decode = jwt.verify(token, SECRET_key);
-            const user = Users.findByPk(decode.data.id);
-            user.IsOnline = false;
-            await user.save();
+            if(!decode){
+                res.status(401).json({ message: 'Token is invalid' });
+                return;
+            }
+            await Users.findByIdAndUpdate(decode.data._id, { IsOnline: false });
             res.clearCookie('token');
-            res.status(200).json({ message: "Logout successfully" });
+            res.status(200).json({ message: "Logout successfully"});
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -148,10 +141,34 @@ const logout_removeCookie = async (req, res) => {
 
 const changePasswordByEmail = async (req, res) => {
     let Email = req.body.Email || req.query.Email || req.params.Email;
+    let token = req.headers.token || req.body.token || req.query.token || req.cookies?.token;
     const { Password } = req.body;
     try {
+        if (!token) {
+            res.status(401).json({ message: 'You have to login before' });
+            return;
+        }
+        const decode = jwt.verify(token, SECRET_key);
+        if(!decode){
+            res.status(401).json({ message: 'Token is invalid' });
+            return;
+        }
         Email = Email.toLowerCase();
-        await Users.findOneAndUpdate({Email}, {Password});
+        if(Email !== decode.data.Email){
+            res.status(404).json({message: `You are not allowed to change password for ${Email}`});
+            return;
+        }
+        const user = await Users.findOne({Email});
+        if(user.IsActive === true){
+            res.status(404).json({message: `You have already changed password for first login`});
+            return;
+        }
+        user.Password = Password;
+        user.IsActive = true;
+        await user.save();
+        user.Password = undefined;
+        token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
+        res.cookie('token', token, { maxAge: timeToken });
         res.status(200).json({ message: 'Changed password successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -162,20 +179,34 @@ const changePasswordById = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     const { Password } = req.body;
     try {
-        await Users.findByIdAndUpdate(id, {Password});
+        const user = await Users.findByIdAndUpdate(id, {Password}, {new: true}).select('-Password');
+        const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
+        res.cookie('token', token, { maxAge: timeToken });
         res.status(200).json({ message: 'Changed password successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
 
-const banUser = async (req, res) => {
+const lockUp = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     try {
-        const user = await Users.findOne({ where: { id } });
-        user.IsLocked = true;
-        await user.save();
-        res.status(200).json({message: `Employee ${user.Fullname} is locked`});
+        const user = await Users.findOneAndUpdate(id, {IsLocked: true}, {new: true});
+        const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
+        res.cookie('token', token, { maxAge: timeToken });
+        res.status(200).json({message: `Employee ${user.Email} is locked`});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const unLock = async (req, res) => {
+    const id = req.params.id || req.body.id || req.query.id;
+    try {
+        const user = await Users.findOneAndUpdate(id, {IsLocked: false}, {new: true});
+        const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
+        res.cookie('token', token, { maxAge: timeToken });
+        res.status(200).json({message: `Employee ${user.Email} is unlocked`});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -190,6 +221,7 @@ module.exports = {
     logout_removeCookie,
     changePasswordByEmail,
     changePasswordById,
-    banUser,
-    resendEmail
+    resendEmail,
+    lockUp,
+    unLock
 }

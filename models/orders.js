@@ -1,30 +1,15 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Orders extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-      Orders.belongsTo(models.Customers, { foreignKey: 'CustomerID'});
-      Orders.belongsTo(models.Users, { foreignKey: 'UserID'});
-      Orders.hasMany(models.OrderDetails, { foreignKey: 'OrderID'});
-    }
-  }
-  Orders.init({
-    UserID: DataTypes.INTEGER,
-    CustomerID: DataTypes.INTEGER,
-    TotalAmount: DataTypes.FLOAT,
-    AmountPaidByCustomer: DataTypes.FLOAT,
-    ChangeReturnedToCustomer: DataTypes.FLOAT,
-  }, {
-    sequelize,
-    modelName: 'Orders',
-  });
-  return Orders;
-};
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const OrderSchema = new Schema({
+  User: { type: Schema.Types.ObjectId, ref: 'User' },
+  Customer: { type: Schema.Types.ObjectId, ref: 'Customer' },
+  TotalAmount: { type: Number, required: true },
+  AmountPaidByCustomer: { type: Number, required: true },
+  ChangeReturnedToCustomer: { type: Number, required: true },
+  OrderDetails: [{ type: Schema.Types.ObjectId, ref: 'OrderDetail', required: true }]
+});
+
+const Orders = mongoose.model('Order', OrderSchema);
+
+module.exports = Orders;
