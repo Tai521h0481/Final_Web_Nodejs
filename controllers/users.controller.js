@@ -64,26 +64,46 @@ const sendEmail = (Email) => {
 
 const resendEmail = async (req, res) => {
     let Email = req.body.Email || req.query.Email || req.params.Email;
+    let responseSent = false;
     try {
-        const message = await sendEmail(Email);
-        res.status(200).json({ message });
+        const message = await sendEmail(Email).catch(error => {
+            if (!responseSent) {
+                res.status(500).json({ message: error.message });
+                responseSent = true;
+            }
+        });
+        if (!responseSent) {
+            res.status(200).json({ message });
+        }
     } catch (error) {
-        res.status(500).json({ message: error });
+        if (!responseSent) {
+            res.status(500).json({ message: error.message });
+        }
     }
 }
 
 const createUser = async (req, res) => {
     let { Fullname, Email } = req.body;
+    let responseSent = false;
     try {
         Email = Email.toLowerCase();
         const Password = Email.split('@')[0];
         Profile_Picture = gravatar.url(Email, { s: avatarSize, r: 'x', d: 'retro' }, true);
         const user = await Users.create({ Fullname, Email, Password, Profile_Picture });
-        const message = await sendEmail(Email);
-        user.Password = undefined;
-        res.status(200).json({ message, user });
+        const message = await sendEmail(Email).catch(error => {
+            if (!responseSent) {
+                res.status(500).json({ message: error.message });
+                responseSent = true;
+            }
+        });
+        if (!responseSent) {
+            user.Password = undefined;
+            res.status(200).json({ message, user });
+        }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (!responseSent) {
+            res.status(500).json({ message: error.message });
+        }
     }
 }
 
@@ -177,9 +197,15 @@ const changePasswordByEmail = async (req, res) => {
 
 const changePasswordById = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
-    const { Password } = req.body;
+    const { Password, newPassword } = req.body;
     try {
-        const user = await Users.findByIdAndUpdate(id, {Password}, {new: true}).select('-Password');
+        const user = await Users.findOne({ _id: id, Password });
+        if(!user){
+            return res.status(401).json({message: 'Password is incorrect'});
+        }
+        user.Password = newPassword;
+        await user.save();
+        user.Password = undefined;
         const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
         res.cookie('token', token, { maxAge: timeToken });
         res.status(200).json({ message: 'Changed password successfully' });

@@ -8,7 +8,11 @@ const OrderSchema = new Schema({
   AmountPaidByCustomer: { type: Number, required: true },
   ChangeReturnedToCustomer: { type: Number, required: true },
   OrderDetails: [{ type: Schema.Types.ObjectId, ref: 'OrderDetail', required: true }]
-});
+},
+  {
+    timestamps: true
+  }
+);
 
 const Orders = mongoose.model('Order', OrderSchema);
 
