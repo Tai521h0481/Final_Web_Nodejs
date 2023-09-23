@@ -175,10 +175,13 @@ const changePasswordByEmail = async (req, res) => {
         }
         Email = Email.toLowerCase();
         if(Email !== decode.data.Email){
-            res.status(404).json({message: `You are not allowed to change password for ${Email}`});
+            res.status(401).json({message: `You are not allowed to change password for ${Email}`});
             return;
         }
         const user = await Users.findOne({Email});
+        if(user.Password === Password){
+            return res.status(401).json({message: `Password and new Password have to difference`});
+        }
         if(user.IsActive === true){
             res.status(404).json({message: `You have already changed password for first login`});
             return;

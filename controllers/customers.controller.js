@@ -1,4 +1,4 @@
-const {Customers} = require('../models');
+const {Customers, Orders} = require('../models');
 
 const getAllCustomers = async (req, res) => {
     try {
@@ -13,16 +13,6 @@ const getAllCustomers = async (req, res) => {
     }
 }
 
-const getCustomerById = async (req, res) => {
-    const id = req.params.id || req.body.id || req.query.id;
-    try {
-        const customer = await Customers.findById(id);
-        res.status(200).json(customer);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}
-
 const getCustomerByTel = async (req, res) => {
     const tel = req.params.tel || req.body.tel || req.query.tel;
     try {
@@ -30,16 +20,17 @@ const getCustomerByTel = async (req, res) => {
         if(!customer){
             return res.status(404).json({message: "Customer not found"});
         }
-        res.status(200).json(customer);
+        const orders = await Orders.find({Customer:customer._id});
+        res.status(200).json(customer, orders);
     } catch (error) {
         
     }
 }
 
 const createCustomer = async (req, res) => {
-    const {Name, Email, Password} = req.body;
+    const {FullName, PhoneNumber, Address} = req.body;
     try {
-        const customer = await Customers.create({Name, Email, Password});
+        const customer = await Customers.create({FullName, PhoneNumber, Address});
         res.status(200).json(customer);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -48,7 +39,6 @@ const createCustomer = async (req, res) => {
 
 module.exports = {
     getAllCustomers,
-    getCustomerById,
     createCustomer,
     getCustomerByTel
 }

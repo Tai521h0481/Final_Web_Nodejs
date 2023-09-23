@@ -2,7 +2,7 @@ const express = require('express');
 const orderDetailRouter = express.Router();
 require('dotenv').config();
 
-// Lấy danh sách tất cả chi tiết đơn hàng.
-orderDetailRouter.get('/', /* Your handler here */);
+// lấy chi tiết đơn hàng theo id đơn hàng
+orderDetailRouter.get('/:orderId', /* Your handler here */);
 
 module.exports = orderDetailRouter;
