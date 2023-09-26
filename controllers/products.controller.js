@@ -28,7 +28,13 @@ const getProductById = async (req, res) => {
 const getProductByName = async (req, res) => {
     const Name = req.params.Name || req.body.Name || req.query.Name;
     try {
-        const product = await Products.findOne({Name});
+        let product;
+        if (req.user.data.Role === 'employee') {
+            product = await Products.findOne({Name}).select('-ImportPrice');
+        }
+        else {
+            product = await Products.findOne({Name});
+        }
         if(!product){
             return res.status(404).json({message: `Product with Name: ${Name} not found`});
         }
@@ -41,7 +47,13 @@ const getProductByName = async (req, res) => {
 const getProductByBarcode = async (req, res) => {
     const Barcode = req.params.Barcode || req.body.Barcode || req.query.Barcode;
     try {
-        const product = await Products.findOne({Barcode});
+        let product;
+        if (req.user.data.Role === 'employee') {
+            product = await Products.findOne({Barcode}).select('-ImportPrice');
+        }
+        else {
+            product = await Products.findOne({Barcode});
+        }
         if(!product){
             return res.status(404).json({message: `Product with Barcode: ${Barcode} not found`});
         }

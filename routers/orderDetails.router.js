@@ -1,8 +1,19 @@
 const express = require('express');
-const orderDetailRouter = express.Router();
+const orderDetailsRouter = express.Router();
 require('dotenv').config();
 
-// lấy chi tiết đơn hàng theo id đơn hàng
-orderDetailRouter.get('/:orderId', /* Your handler here */);
+const {createOrderDetail} = require('../controllers/orderDetails.controller');
+const {isExistId,
+    isCreated,
+    validateInput,
+    isExistEmail,
+    isActive} = require('../middlewares/validations/validation');
+const {authentication} = require('../middlewares/authentication/authentication');
+const {authorization} = require('../middlewares/authorization/authorization');
 
-module.exports = orderDetailRouter;
+const authMiddleware  = [authentication, authorization(['employee']), isActive];
+
+// tạo chi tiết đơn hàng
+orderDetailsRouter.post('/', ...authMiddleware, validateInput(['Quantity', 'UnitPrice', 'Order', 'Product']), createOrderDetail);
+
+module.exports = orderDetailsRouter;

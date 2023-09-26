@@ -1,6 +1,5 @@
 const multer = require("multer");
 const { mkdirp } = require("mkdirp");
-const path = require('path');
 
 const uploadImg = (type) => {
   const path = `./public/images/${type}`;

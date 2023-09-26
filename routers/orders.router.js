@@ -2,12 +2,26 @@ const express = require('express');
 const ordersRouter = express.Router();
 require('dotenv').config();
 
-ordersRouter.post('', /* Your handler here */);
+
+const {getAllOrders,
+    getOrderById,
+    createOrder, getCustomerOrderHistory} = require('../controllers/orders.controller');
+const {isExistId,
+    isCreated,
+    validateInput,
+    isExistEmail,
+    isActive} = require('../middlewares/validations/validation');
+const {authentication} = require('../middlewares/authentication/authentication');
+const {authorization} = require('../middlewares/authorization/authorization');
+
+const authMiddleware  = [authentication, authorization(['employee']), isActive];
+
+ordersRouter.post('/', ...authMiddleware, validateInput(['TotalAmount', 'AmountPaidByCustomer', 'Customer']),createOrder);
 // Lấy danh sách tất cả đơn hàng.
-ordersRouter.get('' /* Your handler here */);
+ordersRouter.get('/' , ...authMiddleware, getAllOrders);
 // Lấy thông tin của một đơn hàng cụ thể.
-ordersRouter.get(`/:id`, /* Your handler here */);
-// Cập nhật thông tin của một đơn hàng cụ thể.
-ordersRouter.put(`/:id`, /* Your handler here */);
+ordersRouter.get(`/:id`, ...authMiddleware, getOrderById);
+// lấy lịch sử đơn hàng của khách hàng
+ordersRouter.get(`/customer/:tel`, ...authMiddleware, getCustomerOrderHistory);
 
 module.exports = ordersRouter;

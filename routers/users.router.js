@@ -7,12 +7,12 @@ const {createUser, getAllUsers, getUserById, login, logout_removeCookie,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
     , lockUp, unLock} = require('../controllers/users.controller');
 const {uploadImg} = require('../middlewares/upload/uploadImage');
-const {isCreated, isExistId, validateInput, isExistEmail, isActive} = require('../middlewares/validations/validation');
+const {isCreated, isExistId, validateInput, isExistEmail, isActive, checkIsNewEmployee} = require('../middlewares/validations/validation');
 const {authentication} = require('../middlewares/authentication/authentication');
 const {authorization} = require('../middlewares/authorization/authorization');
 
 // Đăng nhập vào hệ thống. (đã test)
-usersRouter.post('/login', login);
+usersRouter.post('/login', checkIsNewEmployee, login);
 // Đổi mật khẩu cho employee mới không cần password cũ (đã test)
 usersRouter.put('/employees/:Email', authentication, validateInput(['Password']), isExistEmail(Users), changePasswordByEmail);
 //Đăng xuất khỏi hệ thống. (đã test)

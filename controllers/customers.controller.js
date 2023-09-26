@@ -3,7 +3,6 @@ const {Customers, Orders} = require('../models');
 const getAllCustomers = async (req, res) => {
     try {
         const customers = await Customers.find();
-        // check customers if empty
         if(!customers){
             return res.status(404).json({message: "There is no customer"});
         }
@@ -20,8 +19,7 @@ const getCustomerByTel = async (req, res) => {
         if(!customer){
             return res.status(404).json({message: "Customer not found"});
         }
-        const orders = await Orders.find({Customer:customer._id});
-        res.status(200).json(customer, orders);
+        res.status(200).json(customer);
     } catch (error) {
         
     }

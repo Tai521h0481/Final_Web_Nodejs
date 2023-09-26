@@ -11,11 +11,11 @@ const userMail = process.env.userMail;
 const passMail = process.env.passMail;
 const BASE_URL = process.env.BASE_URL;
 const pageChangePassword = process.env.pageChangePassword;
-let linkLogin = `${BASE_URL}${pageChangePassword}`;
 const nodemailer = require('nodemailer');
 
 let transporter = nodemailer.createTransport({
     service: 'hotmail',
+    // service: 'gmail',
     auth: {
         user: userMail,
         pass: passMail
@@ -42,6 +42,7 @@ const getUserById = async (req, res) => {
 }
 
 const sendEmail = (Email) => {
+    let linkLogin = `${BASE_URL}${pageChangePassword}`;
     Email = Email.toLowerCase();
     const token = jwt.sign({ Email }, SECRET_key, { expiresIn: '1m' }); // Token expires in 1 minute
     linkLogin += `?token=${token}`;

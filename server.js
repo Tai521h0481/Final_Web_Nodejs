@@ -14,9 +14,12 @@ app.use('/api', rootRouter);
 app.use(express.static(__dirname));
 const {authenticationLinkLogin} = require('./middlewares/authentication/authentication');
 const pageChangePassword = process.env.pageChangePassword;
+app.get('/', (req, res) => {
+  res.redirect('/login.html');
+})
 app.get(pageChangePassword, authenticationLinkLogin, (req, res) => {
-  const Email = req.user.Email;
-  res.redirect(`/changePassword.html?Email=${Email}`);
+  const token = req.query.token;
+  res.redirect(`/login.html?token=${token}`);
 })
 //
 

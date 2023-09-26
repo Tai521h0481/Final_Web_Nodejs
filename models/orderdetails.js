@@ -6,7 +6,11 @@ const OrderDetailSchema = new Schema({
   Product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
   Quantity: { type: Number, required: true },
   UnitPrice: { type: Number, required: true }
-});
+},
+  {
+    timestamps: true
+  }
+);
 
 const OrderDetails = mongoose.model('OrderDetail', OrderDetailSchema);
 
