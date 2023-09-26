@@ -1,4 +1,4 @@
-const {Products} = require('../models');
+const {Products, OrderDetails} = require('../models');
 
 const getAllProducts = async (req, res) => {
     try {
@@ -82,9 +82,9 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
-    const {Name, ImportPrice, RetailPrice, Category} = req.body;
+    const {Name, ImportPrice, RetailPrice, Category, Quantity} = req.body;
     try {
-        const product = await Products.findOneAndUpdate(id, {Name, ImportPrice, RetailPrice, Category}, {new: true});
+        const product = await Products.findByIdAndUpdate(id, {Name, ImportPrice, RetailPrice, Category, Quantity}, {new: true});
         res.status(200).json(product);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -94,8 +94,16 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     try {
-        const product = await Products.destroy({where: {id}});
-        res.status(200).json(product);
+        const orderDetail = await OrderDetails.findOne({Product: id});
+        if (orderDetail) {
+            return res.status(400).json({message: "Cannot delete product that has been ordered"});
+        }
+
+        const product = await Products.findByIdAndDelete(id);
+        if(product){
+            return res.status(200).json({ message: "Deleted product successfully", product});
+        }
+        res.status(404).json({message: `Product with id: ${id} not found`});
     } catch (error) {
         res.status(500).json({message: error.message});
     }

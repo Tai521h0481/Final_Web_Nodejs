@@ -221,7 +221,7 @@ const changePasswordById = async (req, res) => {
 const lockUp = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     try {
-        const user = await Users.findOneAndUpdate(id, {IsLocked: true}, {new: true});
+        const user = await Users.findByIdAndUpdate(id, {IsLocked: true}, {new: true});
         const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
         res.cookie('token', token, { maxAge: timeToken });
         res.status(200).json({message: `Employee ${user.Email} is locked`});
@@ -233,7 +233,7 @@ const lockUp = async (req, res) => {
 const unLock = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     try {
-        const user = await Users.findOneAndUpdate(id, {IsLocked: false}, {new: true});
+        const user = await Users.findByIdAndUpdate(id, {IsLocked: false}, {new: true});
         const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
         res.cookie('token', token, { maxAge: timeToken });
         res.status(200).json({message: `Employee ${user.Email} is unlocked`});
