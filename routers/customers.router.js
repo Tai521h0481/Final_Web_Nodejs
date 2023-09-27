@@ -2,7 +2,7 @@ const express = require('express');
 const customersRouter = express.Router();
 require('dotenv').config();
 
-const {createCustomer, getAllCustomers, getCustomerByTel, } = require('../controllers/customers.controller');
+const {createCustomer, getAllCustomers, getCustomerByTel, getCustomerOrderHistory} = require('../controllers/customers.controller');
 const {authentication} = require('../middlewares/authentication/authentication');
 const {authorization} = require('../middlewares/authorization/authorization');
 const {isExistId,
@@ -10,12 +10,13 @@ const {isExistId,
     validateInput,
     isExistEmail,
     isActive} = require('../middlewares/validations/validation');
-const {Customers} = require("../models");
 
 customersRouter.post('/', authentication, authorization(['employee']), isActive, validateInput(['FullName', 'PhoneNumber', 'Address']),createCustomer);
 // Lấy danh sách tất cả khách hàng.
 customersRouter.get('/', authentication, authorization(['employee']), isActive, getAllCustomers);
 // Lấy thông tin của kh bằng telephone
 customersRouter.get(`/:tel`, authentication, authorization(['employee']), isActive, getCustomerByTel);
+// Lấy thông tin khách hàng kèm lịch sử đặt hàng
+customersRouter.get('/history/:tel', authentication, authorization(['employee']), isActive, getCustomerOrderHistory);
 
 module.exports = customersRouter;
