@@ -1,35 +1,35 @@
-const multer = require("multer");
-const { mkdirp } = require("mkdirp");
+require('dotenv').config();
 
-const uploadImg = (type) => {
-  const path = `./public/images/${type}`;
-  mkdirp.sync(path);
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, path);
-    },
-    filename: function (req, file, cb) {
-      cb(null, Date.now() + "_" + file.originalname);
-    },
-  });
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-  const upload = multer({
-    storage: storage,
-    limits:{
-      fileSize: 1024 * 1024 * 1
-    },
-    fileFilter: function (req, file, cb) {
-      const allowedTypes = ["png", "jpg", "jpeg"];
-      const extentionF = file.originalname.split(".");
-      const extention = extentionF[extentionF.length - 1];
-      if (!allowedTypes.includes(extention)) {
-        return cb(new Error("File type is not supported"));
-      }
-      cb(null, true);
-    },
-  }).single(type);
-  return upload;
-};
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET_KEY,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  allowedFormats: ['jpg', 'png', 'jpeg'],
+  params: {
+    folder: 'cloudImageWebNodejs',
+  },
+});
+
+const uploadImg = multer({
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Not an image!'), false);
+    }
+    cb(null, true);
+  },
+  limits: {
+    fileSize: 200 * 1024
+  }
+});
 
 module.exports = {
   uploadImg,

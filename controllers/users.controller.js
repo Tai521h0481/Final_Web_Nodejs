@@ -127,7 +127,7 @@ const login = async (req, res) => {
 
 const upLoadAvatar = async (req, res) => {
     const { file } = req;
-    const urlImg = `http://localhost:3000/${file.path}`;
+    const urlImg = file?.path;
     const id = req.params.id || req.body.id || req.query.id;
     try {
         const user = await Users.findByIdAndUpdate(id, { Profile_Picture: urlImg }, { new: true }).select('-Password');
