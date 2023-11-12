@@ -11,6 +11,18 @@ const UserSchema = new Schema({
   IsLocked: { type: Boolean, default: false },
   IsActive: { type: Boolean, default: false },
   Orders: [{ type: Schema.Types.ObjectId, ref: 'Order', required: true }]
+}, {
+    toJSON: {
+        virtuals: true, 
+        transform: function(doc, ret) {
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+            return ret;
+        }
+    },
+    toObject: { virtuals: true },
+    versionKey: false 
 });
 
 const Users = mongoose.model('User', UserSchema);

@@ -53,10 +53,10 @@
 // const Products = mongoose.model('Product', ProductSchema);
 // const Users = mongoose.model('User', UserSchema);
 
-const Customers = require('./customers');
-const OrderDetails = require('./orderdetails');
-const Orders = require('./orders');
-const Products = require('./products');
-const Users = require('./users');
+const Customers = require('./Customers');
+const OrderDetails = require('./Orderdetails');
+const Orders = require('./Orders');
+const Products = require('./Products');
+const Users = require('./Users');
 
 module.exports = { Customers, OrderDetails, Orders, Products, Users };

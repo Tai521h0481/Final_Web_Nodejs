@@ -1,11 +1,13 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;
 const rootRouter = require('./routers');
 const path = require('path');
 const staticPath = path.join(__dirname, 'public');
+app.use(cors());
 app.use("/public", express.static(staticPath));
 app.use(express.json());    
 app.use('/api', rootRouter);

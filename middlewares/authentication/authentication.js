@@ -3,7 +3,13 @@ require('dotenv').config();
 const SECRET_key = process.env.SECRET_key;
 
 const authentication = (req, res, next) => {
-    const token = req.cookies?.token || req.headers.token || req.body.token || req.query.token; 
+    let token;
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+      ) {
+        token = req.headers.authorization.split(' ')[1];
+      }
     if(token){
         try {
             const decoded = jwt.verify(token, SECRET_key);
