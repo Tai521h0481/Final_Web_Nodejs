@@ -5,6 +5,7 @@ require('dotenv').config();
 const {createProduct, deleteProduct, getAllProducts, getProductById, updateProduct, getProductByBarcode, getProductByName} = require('../controllers/products.controller');
 const {authentication} = require('../middlewares/authentication/authentication');
 const {authorization} = require('../middlewares/authorization/authorization');
+const {uploadProductImage} = require('../middlewares/upload/uploadImage');
 const {isExistId,
     isCreated,
     validateInput,
@@ -14,7 +15,7 @@ const {Products} = require('../models');
 
 
 // chỉ admin thêm (đã test)
-productsRouter.post('/', authentication, authorization(['admin']), validateInput(["Name", "ImportPrice", "RetailPrice", "Category", "Quantity"]), createProduct);
+productsRouter.post('/', authentication, authorization(['admin']), validateInput(["Name", "ImportPrice", "RetailPrice", "Category", "Quantity"]), uploadProductImage.single('image_product'), createProduct);
 // Lấy danh sách tất cả sản phẩm. (đã test)
 productsRouter.get('/', authentication, authorization(['admin', 'employee']), isActive, getAllProducts);
 // Lấy thông tin của một sản phẩm cụ thể theo id

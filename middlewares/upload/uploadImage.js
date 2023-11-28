@@ -1,36 +1,53 @@
-require('dotenv').config();
-
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
+// Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET_KEY,
 });
 
-const storage = new CloudinaryStorage({
+// Storage for user avatar images
+const avatarStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  allowedFormats: ['jpg', 'png', 'jpeg'],
   params: {
-    folder: 'cloudImageWebNodejs',
+    folder: 'cloudImageWebNodejs/avatar',
+    allowedFormats: ['jpg', 'png', 'jpeg'],
   },
 });
 
-const uploadImg = multer({
-  storage: storage,
-  fileFilter: function (req, file, cb) {
-    if (!file.mimetype.startsWith('image/')) {
-      return cb(new Error('Not an image!'), false);
-    }
-    cb(null, true);
+// Storage for product images
+const productStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'cloudImageWebNodejs/piture_product',
+    allowedFormats: ['jpg', 'png', 'jpeg'],
   },
-  limits: {
-    fileSize: 200 * 1024
-  }
 });
+
+// Multer upload for avatar
+const uploadAvatar = multer({
+  storage: avatarStorage,
+  fileFilter: imageFileFilter
+});
+
+// Multer upload for product images
+const uploadProductImage = multer({
+  storage: productStorage,
+  fileFilter: imageFileFilter
+});
+
+// File filter function
+function imageFileFilter(req, file, cb) {
+  if (!file.mimetype.startsWith('image/')) {
+    return cb(new Error('Not an image!'), false);
+  }
+  cb(null, true);
+}
 
 module.exports = {
-  uploadImg,
+  uploadAvatar,
+  uploadProductImage,
 };

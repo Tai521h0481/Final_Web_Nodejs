@@ -65,8 +65,10 @@ const getProductByBarcode = async (req, res) => {
 
 const createProduct = async (req, res) => {
     const {Name, ImportPrice, RetailPrice, Category, Quantity} = req.body;
+    const { file } = req;
+    const urlImg = file?.path;
     try {
-        let product = await Products.findOne({Name, ImportPrice, RetailPrice, Category});
+        let product = await Products.findOne({Name, ImportPrice, RetailPrice, Category, Image: urlImg});
         if(product){
             product.Quantity += Quantity;
             await product.save();
