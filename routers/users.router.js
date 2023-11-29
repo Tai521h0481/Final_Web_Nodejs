@@ -6,7 +6,7 @@ const {Users} = require('../models');
 const {createUser, getAllUsers, getUserById, login, logout_removeCookie,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
     , lockUp, unLock} = require('../controllers/users.controller');
-const {uploadImg} = require('../middlewares/upload/uploadImage');
+const {uploadAvatar} = require('../middlewares/upload/uploadImage');
 const {isCreated, isExistId, validateInput, isExistEmail, isActive, checkIsNewEmployee} = require('../middlewares/validations/validation');
 const {authentication} = require('../middlewares/authentication/authentication');
 const {authorization} = require('../middlewares/authorization/authorization');
@@ -22,7 +22,7 @@ usersRouter.get('/profiles/:id', authentication, isExistId(Users), isActive, get
 //Cập nhật password của người dùng hiện tại. (đã test)
 usersRouter.put('/profiles/changePassword/:id',authentication, isExistId(Users), isActive, validateInput(['Password', 'newPassword']), changePasswordById);
 //Cập nhật avatar của người dùng hiện tại (nhận từ body dạng formData) (đã test)
-usersRouter.put('/profiles/avatars/:id', authentication, isExistId(Users), isActive, uploadImg.single('avatars'), upLoadAvatar);
+usersRouter.put('/profiles/avatars/:id', authentication, isExistId(Users), isActive, uploadAvatar.single('avatars'), upLoadAvatar);
 // Tạo một tài khoản mới (chỉ dành cho quản trị viên). (đã test)
 usersRouter.post('/register', authentication, authorization(["admin"]), validateInput(['Fullname', 'Email']) , isCreated(Users), createUser);
 // Lấy danh sách tất cả người dùng (chỉ dành cho quản trị viên). (đã test)
