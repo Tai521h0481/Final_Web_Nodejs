@@ -34,7 +34,7 @@ const isExistId = (Model) => async (req, res, next) => {
 const isCreated = (Model) => async (req, res, next) => {
     const Email = req.body.Email || req.query.Email || req.params.Email;
     try {
-        const user = await Model.findOne({ Email });
+        const user = await Model.findOne({ Username: Email });
         if (user) {
             res.status(409).json({ error: "Employee already exists" });
         } else {
@@ -75,7 +75,7 @@ const isActive = async (req, res, next) => {
 const checkIsNewEmployee = async (req, res, next) => {
     const { Email, Password } = req.body;
     try {
-        const user = await Users.findOne({ Email, Password });
+        const user = await Users.findOne({ Username: Email, Password });
         if(!user) {
             return res.status(401).json({ message: "Wrong Email or Password" });
         }

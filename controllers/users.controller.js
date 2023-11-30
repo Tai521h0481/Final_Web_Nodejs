@@ -88,9 +88,10 @@ const createUser = async (req, res) => {
     let responseSent = false;
     try {
         Email = Email.toLowerCase();
+        const Username = Email.split('@')[0];
         const Password = Email.split('@')[0];
         Profile_Picture = gravatar.url(Email, { s: avatarSize, r: 'x', d: 'retro' }, true);
-        const user = await Users.create({ Fullname, Email, Password, Profile_Picture });
+        const user = await Users.create({ Username, Fullname, Email, Password, Profile_Picture });
         const message = await sendEmail(Email).catch(error => {
             if (!responseSent) {
                 res.status(500).json({ message: error.message });
@@ -112,7 +113,7 @@ const login = async (req, res) => {
     let { Email, Password } = req.body;
     try {
         Email = Email.toLowerCase();
-        const user = await Users.findOneAndUpdate({ Email, Password}, {IsOnline: true}, {new: true}).select('-Password');
+        const user = await Users.findOneAndUpdate({ Username: Email, Password}, {IsOnline: true}, {new: true}).select('-Password');
         if(!user){
             res.status(401).json({ message: 'Email or password is incorrect' });
             return;
@@ -175,11 +176,11 @@ const changePasswordByEmail = async (req, res) => {
             return;
         }
         Email = Email.toLowerCase();
-        if(Email !== decode.data.Email){
+        if(Email !== decode.data.Username){
             res.status(401).json({message: `You are not allowed to change password for ${Email}`});
             return;
         }
-        const user = await Users.findOne({Email});
+        const user = await Users.findOne({Username: Email});
         if(user.Password === Password){
             return res.status(401).json({message: `Password and new Password have to difference`});
         }
