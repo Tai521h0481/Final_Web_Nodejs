@@ -25,7 +25,7 @@ productsRouter.get(`/barcode/:Barcode`, authentication, authorization(['admin', 
 // Lấy thông tin của một sản phẩm cụ thể theo Name
 productsRouter.get(`/name/:Name`, authentication, authorization(['admin', 'employee']), isActive ,getProductByName);
 // Cập nhật thông tin của một sản phẩm cụ thể (chỉ dành cho quản trị viên).
-productsRouter.put(`/:id`, authentication, authorization(['admin']), isExistId(Products), updateProduct);
+productsRouter.patch(`/:id`, authentication, authorization(['admin']), isExistId(Products), updateProduct);
 // Xóa một sản phẩm cụ thể nếu chưa được mua (chỉ dành cho quản trị viên).
 productsRouter.delete(`/:id`, authentication, authorization(['admin']), deleteProduct);
 

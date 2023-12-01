@@ -113,7 +113,7 @@ const login = async (req, res) => {
     let { Email, Password } = req.body;
     try {
         Email = Email.toLowerCase();
-        const user = await Users.findOneAndUpdate({ Username: Email, Password}, {IsOnline: true}, {new: true}).select('-Password');
+        const user = await Users.findOneAndUpdate({ Username: Email, Password}, {IsOnline: true, FirstLogin: true}, {new: true}).select('-Password');
         if(!user){
             res.status(401).json({ message: 'Email or password is incorrect' });
             return;
@@ -190,6 +190,7 @@ const changePasswordByEmail = async (req, res) => {
         }
         user.Password = Password;
         user.IsActive = true;
+        user.FirstLogin = false;
         await user.save();
         user.Password = undefined;
         token = jwt.sign({ data: user }, SECRET_key, { expiresIn });

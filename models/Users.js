@@ -11,6 +11,7 @@ const UserSchema = new Schema({
   IsOnline: { type: Boolean, default: false },
   IsLocked: { type: Boolean, default: false },
   IsActive: { type: Boolean, default: false },
+  FirstLogin: { type: Boolean, default: false },
   Orders: [{ type: Schema.Types.ObjectId, ref: 'Order', required: true }]
 }, {
     toJSON: {
