@@ -5,7 +5,7 @@ require('dotenv').config();
 const {Users} = require('../models');
 const {createUser, getAllUsers, getUserById, login, logout_removeCookie,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
-    , lockUp, unLock} = require('../controllers/users.controller');
+    , toggleLock} = require('../controllers/users.controller');
 const {uploadAvatar} = require('../middlewares/upload/uploadImage');
 const {isCreated, isExistId, validateInput, isExistEmail, isActive, checkIsNewEmployee} = require('../middlewares/validations/validation');
 const {authentication} = require('../middlewares/authentication/authentication');
@@ -31,9 +31,7 @@ usersRouter.get('/',authentication, authorization(["admin"]), getAllUsers);
 usersRouter.get('/:id', authentication, authorization(["admin"]), isExistId(Users), getUserById);
 // send lại link login cho employee (salesperson) cần truyền Email vào body (đã test)
 usersRouter.post('/resendEmail', authentication, authorization(["admin"]), validateInput(['Email']), isExistEmail(Users), resendEmail);
-// Khóa tài khoản của người dùng (chỉ dành cho quản trị viên). (đã test)
-usersRouter.patch('/lockUp/:id', authentication, authorization(["admin"]), isExistId(Users), lockUp);
-// Mở khóa tài khoản của người dùng (chỉ dành cho quản trị viên). (đã test)
-usersRouter.patch('/unLock/:id', authentication, authorization(["admin"]), isExistId(Users), unLock);
+// Mở hoặc khóa tài khoản của người dùng (chỉ dành cho quản trị viên). (đã test)
+usersRouter.patch('/lock/:id', authentication, authorization(["admin"]), isExistId(Users), toggleLock);
 
 module.exports = usersRouter;

@@ -220,25 +220,28 @@ const changePasswordById = async (req, res) => {
     }
 }
 
-const lockUp = async (req, res) => {
+const toggleLock = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     try {
-        const user = await Users.findByIdAndUpdate(id, {IsLocked: true}, {new: true});
-        const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
-        res.cookie('token', token, { maxAge: timeToken });
-        res.status(200).json({message: `Employee ${user.Email} is locked`});
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
+        // Fetch the current user without updating
+        const currentUser = await Users.findById(id);
 
-const unLock = async (req, res) => {
-    const id = req.params.id || req.body.id || req.query.id;
-    try {
-        const user = await Users.findByIdAndUpdate(id, {IsLocked: false}, {new: true});
-        const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
+        if (!currentUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Toggle the lock status
+        const updatedUser = await Users.findByIdAndUpdate(id, { IsLocked: !currentUser.IsLocked }, { new: true });
+
+        // Sign a new token with updated user data
+        const token = jwt.sign({ data: updatedUser }, SECRET_key, { expiresIn });
+
+        // Set the new token in cookie
         res.cookie('token', token, { maxAge: timeToken });
-        res.status(200).json({message: `Employee ${user.Email} is unlocked`});
+
+        // Respond with appropriate message
+        const lockStatus = updatedUser.IsLocked ? 'locked' : 'unlocked';
+        res.status(200).json({ message: `Employee ${updatedUser.Email} is ${lockStatus}` });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -254,6 +257,5 @@ module.exports = {
     changePasswordByEmail,
     changePasswordById,
     resendEmail,
-    lockUp,
-    unLock
+    toggleLock
 }
