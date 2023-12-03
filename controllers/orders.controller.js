@@ -34,8 +34,19 @@ const createOrder = async (req, res) => {
     }
 }
 
+const getCustomerOrderHistory = async (req, res) => {
+    const id = req.params.id || req.body.id || req.query.id;
+    try {
+        const customer = await Customers.findById(id).populate('Orders');
+        res.status(200).json(customer.Orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     getAllOrders,
     getOrderById,
-    createOrder
+    createOrder,
+    getCustomerOrderHistory
 }

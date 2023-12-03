@@ -21,5 +21,7 @@ ordersRouter.post('/', ...authMiddleware, validateInput(['TotalAmount', 'AmountP
 ordersRouter.get('/' , ...authMiddleware, getAllOrders);
 // Lấy thông tin của một đơn hàng cụ thể.
 ordersRouter.get(`/:id`, ...authMiddleware, getOrderById);
+// lấy order theo customer
+ordersRouter.get('/customer/:id', ...authMiddleware, getCustomerOrderHistory);
 
 module.exports = ordersRouter;

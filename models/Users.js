@@ -7,7 +7,7 @@ const UserSchema = new Schema({
   Password: { type: String, required: true },
   Fullname: { type: String, required: true },
   Role: { type: String, enum: ['admin', 'employee'], default: 'employee' },
-  Profile_Picture: String,
+  Profile_Picture: { type: String, default: `https://res.cloudinary.com/dfxqz0959/image/upload/v1701536638/cloudImageWebNodejs/piture_product/pdu6r9dtlfnshwrvsbqm.jpg`},
   IsOnline: { type: Boolean, default: false },
   IsLocked: { type: Boolean, default: false },
   IsActive: { type: Boolean, default: false },
