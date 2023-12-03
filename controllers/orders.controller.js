@@ -34,11 +34,23 @@ const createOrder = async (req, res) => {
     }
 }
 
-const getCustomerOrderHistory = async (req, res) => {
-    const id = req.params.id || req.body.id || req.query.id;
+const getEmployeeOrderHistory = async (req, res) => {
+    const userId = req.params.id || req.body.id || req.query.id;
+
     try {
-        const customer = await Customers.findById(id).populate('Orders');
-        res.status(200).json(customer.Orders);
+        const orders = await Orders.aggregate([
+            { $match: { User: mongoose.Types.ObjectId(userId) } },
+            {
+                $lookup: {
+                    from: "orderdetails",
+                    localField: "_id",
+                    foreignField: "Order",
+                    as: "OrderDetails"
+                }
+            }
+        ]);
+
+        res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -48,5 +60,5 @@ module.exports = {
     getAllOrders,
     getOrderById,
     createOrder,
-    getCustomerOrderHistory
+    getEmployeeOrderHistory
 }

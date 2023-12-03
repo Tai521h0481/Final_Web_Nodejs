@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const {getAllOrders,
     getOrderById,
-    createOrder, getCustomerOrderHistory} = require('../controllers/orders.controller');
+    createOrder, getEmployeeOrderHistory} = require('../controllers/orders.controller');
 const {isExistId,
     isCreated,
     validateInput,
@@ -22,6 +22,6 @@ ordersRouter.get('/' , ...authMiddleware, getAllOrders);
 // Lấy thông tin của một đơn hàng cụ thể.
 ordersRouter.get(`/:id`, ...authMiddleware, getOrderById);
 // lấy order theo customer
-ordersRouter.get('/customer/:id', ...authMiddleware, getCustomerOrderHistory);
+ordersRouter.get('/employee/:id', ...authMiddleware, getEmployeeOrderHistory);
 
 module.exports = ordersRouter;
