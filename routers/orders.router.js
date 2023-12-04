@@ -22,6 +22,6 @@ ordersRouter.get('/' , ...authMiddleware, getAllOrders);
 // Lấy thông tin của một đơn hàng cụ thể.
 ordersRouter.get(`/:id`, ...authMiddleware, getOrderById);
 // lấy order theo customer
-ordersRouter.get('/employee/:id', ...authMiddleware, getEmployeeOrderHistory);
+ordersRouter.get('/employee/:id', authentication, authorization(['admin', 'employee']), getEmployeeOrderHistory);
 
 module.exports = ordersRouter;
