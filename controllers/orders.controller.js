@@ -1,4 +1,4 @@
-const { Orders, Customers, OrderDetails, Users } = require('../models');
+const { Orders, Customers, OrderDetails, Users, Products } = require('../models');
 const mongoose = require('mongoose');
 
 const getAllOrders = async (req, res) => {
@@ -24,33 +24,36 @@ const createOrder = async (req, res) => {
     let { user } = req;
     const { TotalAmount, AmountPaidByCustomer, Customer, ListProduct } = req.body;
     try {
-        // Tạo đơn hàng mới
-        const order = await Orders.create({
+        const customer = await Customers.findById(Customer);
+        if (!customer) {
+            return res.status(404).json({ message: "Khách hàng không tồn tại" });
+        }
+        let order = await Orders.create({
             Customer,
             User: user.data.id,
             TotalAmount,
             AmountPaidByCustomer,
             ChangeReturnedToCustomer: AmountPaidByCustomer - TotalAmount
         });
-
-        // Thêm đơn hàng vào danh sách đơn hàng của khách hàng
-        const customer = await Customers.findById(Customer);
-        if (!customer) {
-            return res.status(404).json({ message: "Khách hàng không tồn tại" });
-        }
         customer.Orders.push(order.id);
         await customer.save();
-        // Tạo OrderDetails cho mỗi sản phẩm trong ListProduct
+
         for (const item of ListProduct) {
-            await OrderDetails.create({
+            const orderDetail = await OrderDetails.create({
                 Order: order.id,
                 Product: item.ProductId,
-                Quantity: item.Quantity
+                Quantity: item.Quantity,
             });
+            order.OrderDetails.push(orderDetail.id);
+            await order.save();
         }
+        const orderWithDetails = await Orders.findById(order.id)
+            .populate({
+                path: 'OrderDetails',
+                populate: { path: 'Product' }
+            });
 
-        // Trả về thông tin đơn hàng
-        res.status(200).json(order);
+        res.status(200).json({ customer, orderWithDetails });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

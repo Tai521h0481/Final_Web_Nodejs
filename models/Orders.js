@@ -23,7 +23,7 @@ const OrderSchema = new Schema({
     },
     toObject: { virtuals: true },
     versionKey: false 
-});
+  });
 
 const Orders = mongoose.model('Order', OrderSchema);
 
