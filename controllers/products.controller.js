@@ -64,39 +64,76 @@ const getProductByBarcode = async (req, res) => {
 }
 
 const createProduct = async (req, res) => {
-    let {Name, ImportPrice, RetailPrice, Category, Quantity, Image} = req.body;
+    let { Name, ImportPrice, RetailPrice, Category, Quantity, images } = req.body;
+
     try {
-        let product = await Products.findOne({Name});
-        if(product){
-            await Products.findByIdAndUpdate(product._id, {Quantity: product.Quantity + Quantity}, {new: true});
+        let product = await Products.findOne({ Name });
+        if (product) {
+            await Products.findByIdAndUpdate(product._id, { Quantity: product.Quantity + Quantity }, { new: true });
             return res.status(200).json(product);
         }
-        const Barcode = `${Name}_${Category}_${Date.now()}`
-        product = await Products.create({Barcode, Name, ImportPrice, RetailPrice, Category, Quantity, Image});
+
+        const Barcode = `${Name}_${Category}_${Date.now()}`;
+        product = new Products({ Barcode, Name, ImportPrice, RetailPrice, Category, Quantity });
+
+        // Xử lý thêm ảnh
+        for (const img of images) {
+            let image = new Image({ Image: img, Product: product._id });
+            await image.save();
+            product.Image.push(image._id);
+        }
+
+        await product.save();
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 }
 
 const updateProduct = async (req, res) => {
-    const id = req.params.id || req.body.id || req.query.id;
-    const {Name, ImportPrice, RetailPrice, Category, Quantity, Image} = req.body;
+    const id = req.params.id;
+    const { Name, ImportPrice, RetailPrice, Category, Quantity, newImages } = req.body;
+
     try {
-        const product = await Products.findByIdAndUpdate(id, {Name, ImportPrice, RetailPrice, Category, Quantity, Image}, {new: true});
+        const product = await Products.findById(id);
+
+        // Xóa ảnh cũ nếu có ảnh mới
+        if (newImages && newImages.length > 0) {
+            await Image.deleteMany({ Product: id });
+            product.Image = [];
+
+            for (const img of newImages) {
+                let image = new Image({ Image: img, Product: id });
+                await image.save();
+                product.Image.push(image._id);
+            }
+        }
+
+        // Cập nhật thông tin sản phẩm
+        product.Name = Name || product.Name;
+        product.ImportPrice = ImportPrice || product.ImportPrice;
+        product.RetailPrice = RetailPrice || product.RetailPrice;
+        product.Category = Category || product.Category;
+        product.Quantity = Quantity || product.Quantity;
+
+        await product.save();
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 }
 
 const deleteProduct = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
+
     try {
         const orderDetail = await OrderDetails.findOne({Product: id});
         if (orderDetail) {
             return res.status(400).json({message: "Cannot delete product that has been ordered"});
         }
+
+        // Xóa các ảnh liên quan trước khi xóa sản phẩm
+        await Image.deleteMany({ Product: id });
 
         const product = await Products.findByIdAndDelete(id);
         if(product){
