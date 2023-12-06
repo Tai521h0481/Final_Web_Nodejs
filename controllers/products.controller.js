@@ -4,10 +4,10 @@ const getAllProducts = async (req, res) => {
     try {
         let products;
         if (req.user.data.Role === 'employee') {
-            products = await Products.find().select('-ImportPrice');
+            products = await Products.find().select('-ImportPrice').populate('Image');
         }
         else {
-            products = await Products.find();
+            products = await Products.find().populate('Image');
         }
         res.status(200).json(products);
     } catch (error) {
@@ -15,27 +15,32 @@ const getAllProducts = async (req, res) => {
     }
 }
 
+
 const getProductById = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     try {
-        const product = await Products.findById(id);
+        const product = await Products.findById(id).populate('Image');
+        if (!product) {
+            return res.status(404).json({message: 'Product not found'});
+        }
         res.status(200).json(product);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
 }
 
+
 const getProductByName = async (req, res) => {
     const Name = req.params.Name || req.body.Name || req.query.Name;
     try {
         let product;
         if (req.user.data.Role === 'employee') {
-            product = await Products.findOne({Name}).select('-ImportPrice');
+            product = await Products.findOne({Name}).select('-ImportPrice').populate('Image');
         }
         else {
-            product = await Products.findOne({Name});
+            product = await Products.findOne({Name}).populate('Image');
         }
-        if(!product){
+        if (!product) {
             return res.status(404).json({message: `Product with Name: ${Name} not found`});
         }
         res.status(200).json(product);
@@ -49,12 +54,12 @@ const getProductByBarcode = async (req, res) => {
     try {
         let product;
         if (req.user.data.Role === 'employee') {
-            product = await Products.findOne({Barcode}).select('-ImportPrice');
+            product = await Products.findOne({Barcode}).select('-ImportPrice').populate('Image');
         }
         else {
-            product = await Products.findOne({Barcode});
+            product = await Products.findOne({Barcode}).populate('Image');
         }
-        if(!product){
+        if (!product) {
             return res.status(404).json({message: `Product with Barcode: ${Barcode} not found`});
         }
         res.status(200).json(product);
@@ -78,7 +83,7 @@ const createProduct = async (req, res) => {
 
         // Xử lý thêm ảnh
         for (const img of images) {
-            let image = new Image({ Image: img, Product: product._id });
+            let image = new Image({ Url: img, Product: product._id });
             await image.save();
             product.Image.push(image._id);
         }
@@ -103,7 +108,7 @@ const updateProduct = async (req, res) => {
             product.Image = [];
 
             for (const img of newImages) {
-                let image = new Image({ Image: img, Product: id });
+                let image = new Image({ Url: img, Product: id });
                 await image.save();
                 product.Image.push(image._id);
             }

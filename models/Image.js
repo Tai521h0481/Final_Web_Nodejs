@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const ImageSchema = new Schema(
     {
-        Image: { type: String, required: true },
+        Url: { type: String, required: true },
         Product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
     },
     {
