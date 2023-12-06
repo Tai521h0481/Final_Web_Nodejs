@@ -66,9 +66,6 @@ const getProductByBarcode = async (req, res) => {
 const createProduct = async (req, res) => {
     let {Name, ImportPrice, RetailPrice, Category, Quantity, Image} = req.body;
     try {
-        if(!Image){
-            Image = "https://res.cloudinary.com/dfxqz0959/image/upload/v1701536638/cloudImageWebNodejs/piture_product/pdu6r9dtlfnshwrvsbqm.jpg";
-        }
         let product = await Products.findOne({Name, ImportPrice, RetailPrice, Category, Image});
         if(product){
             product.Quantity += Quantity;
