@@ -15,7 +15,7 @@ const {Products} = require('../models');
 
 
 // chỉ admin thêm (đã test)
-productsRouter.post('/', authentication, authorization(['admin']), validateInput(["Name", "ImportPrice", "RetailPrice", "Category", "Quantity"]), uploadProductImage.single('image_product'), createProduct);
+productsRouter.post('/', authentication, authorization(['admin']), validateInput(["Name", "ImportPrice", "RetailPrice", "Category", "Quantity"]), createProduct);
 // Lấy danh sách tất cả sản phẩm. (đã test)
 productsRouter.get('/', authentication, authorization(['admin', 'employee']), isActive, getAllProducts);
 // Lấy thông tin của một sản phẩm cụ thể theo id
@@ -25,7 +25,7 @@ productsRouter.get(`/barcode/:Barcode`, authentication, authorization(['admin', 
 // Lấy thông tin của một sản phẩm cụ thể theo Name
 productsRouter.get(`/name/:Name`, authentication, authorization(['admin', 'employee']), isActive ,getProductByName);
 // Cập nhật thông tin của một sản phẩm cụ thể (chỉ dành cho quản trị viên).
-productsRouter.patch(`/:id`, authentication, authorization(['admin']), isExistId(Products), uploadProductImage.single('image_product'), updateProduct);
+productsRouter.patch(`/:id`, authentication, authorization(['admin']), isExistId(Products), updateProduct);
 // Xóa một sản phẩm cụ thể nếu chưa được mua (chỉ dành cho quản trị viên).
 productsRouter.delete(`/:id`, authentication, authorization(['admin']), deleteProduct);
 

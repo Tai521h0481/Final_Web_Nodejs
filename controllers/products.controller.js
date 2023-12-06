@@ -64,14 +64,12 @@ const getProductByBarcode = async (req, res) => {
 }
 
 const createProduct = async (req, res) => {
-    const {Name, ImportPrice, RetailPrice, Category, Quantity} = req.body;
-    const { file } = req;
-    let urlImg = file?.path;
+    let {Name, ImportPrice, RetailPrice, Category, Quantity, Image} = req.body;
     try {
-        if(!urlImg){
-            urlImg = "https://res.cloudinary.com/dfxqz0959/image/upload/v1701536638/cloudImageWebNodejs/piture_product/pdu6r9dtlfnshwrvsbqm.jpg";
+        if(!Image){
+            Image = "https://res.cloudinary.com/dfxqz0959/image/upload/v1701536638/cloudImageWebNodejs/piture_product/pdu6r9dtlfnshwrvsbqm.jpg";
         }
-        let product = await Products.findOne({Name, ImportPrice, RetailPrice, Category, Image: urlImg});
+        let product = await Products.findOne({Name, ImportPrice, RetailPrice, Category, Image});
         if(product){
             product.Quantity += Quantity;
             await product.save();
@@ -87,12 +85,8 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
-    const {Name, ImportPrice, RetailPrice, Category, Quantity} = req.body;
+    const {Name, ImportPrice, RetailPrice, Category, Quantity, Image} = req.body;
     try {
-        let Image;
-        if (req.file && req.file.path) {
-            Image = req.file.path;
-        }
         const product = await Products.findByIdAndUpdate(id, {Name, ImportPrice, RetailPrice, Category, Quantity, Image}, {new: true});
         res.status(200).json(product);
     } catch (error) {
