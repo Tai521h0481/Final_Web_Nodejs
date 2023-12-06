@@ -69,7 +69,7 @@ const getProductByBarcode = async (req, res) => {
 }
 
 const createProduct = async (req, res) => {
-    let { Name, ImportPrice, RetailPrice, Category, Quantity, images } = req.body;
+    let { Name, ImportPrice, RetailPrice, Category, Quantity, Image } = req.body;
 
     try {
         let product = await Products.findOne({ Name });
@@ -82,7 +82,7 @@ const createProduct = async (req, res) => {
         product = new Products({ Barcode, Name, ImportPrice, RetailPrice, Category, Quantity });
 
         // Xử lý thêm ảnh
-        for (const img of images) {
+        for (const img of Image) {
             let image = new Image({ Url: img, Product: product.id });
             await image.save();
             product.Image.push(image.id);
@@ -97,17 +97,17 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     const id = req.params.id;
-    const { Name, ImportPrice, RetailPrice, Category, Quantity, newImages } = req.body;
+    const { Name, ImportPrice, RetailPrice, Category, Quantity, Image } = req.body;
 
     try {
         const product = await Products.findById(id);
 
         // Xóa ảnh cũ nếu có ảnh mới
-        if (newImages && newImages.length > 0) {
+        if (Image && Image.length > 0) {
             await Image.deleteMany({ Product: id });
             product.Image = [];
 
-            for (const img of newImages) {
+            for (const img of Image) {
                 let image = new Image({ Url: img, Product: id });
                 await image.save();
                 product.Image.push(image.id);
