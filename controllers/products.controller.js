@@ -89,7 +89,11 @@ const updateProduct = async (req, res) => {
     const id = req.params.id || req.body.id || req.query.id;
     const {Name, ImportPrice, RetailPrice, Category, Quantity} = req.body;
     try {
-        const product = await Products.findByIdAndUpdate(id, {Name, ImportPrice, RetailPrice, Category, Quantity}, {new: true});
+        let Image;
+        if (req.file && req.file.path) {
+            Image = req.file.path;
+        }
+        const product = await Products.findByIdAndUpdate(id, {Name, ImportPrice, RetailPrice, Category, Quantity, Image}, {new: true});
         res.status(200).json(product);
     } catch (error) {
         res.status(500).json({message: error.message});
