@@ -54,17 +54,16 @@ const getProductByBarcode = async (req, res) => {
     try {
         let product;
         if (req.user.data.Role === 'employee') {
-            product = await Products.findOne({Barcode}).select('-ImportPrice').populate('Image');
-        }
-        else {
-            product = await Products.findOne({Barcode}).populate('Image');
+            product = await Products.findOne({ Barcode }).select('-ImportPrice').populate('Image');
+        } else {
+            product = await Products.findOne({ Barcode }).populate('Image');
         }
         if (!product) {
-            return res.status(404).json({message: `Product with Barcode: ${Barcode} not found`});
+            return res.status(404).json({ message: `Product with Barcode: ${Barcode} not found` });
         }
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 }
 
@@ -77,14 +76,14 @@ const createProduct = async (req, res) => {
             return res.status(200).json(product);
         }
 
-        const Barcode = `${Name}_${Category}_${Date.now()}`;
+        const Barcode = `${Name.replace(' ', '_')}_${Category}_${Date.now()}`;
         product = new Products({ Barcode, Name, ImportPrice, RetailPrice, Category, Quantity });
 
         // Xử lý thêm ảnh
         for (const img of Image) {
             let image = new Images({ url: img.url, Product: product.id });
             await image.save();
-            product.Image.push(image.id);
+            product.Image.push(image._id);
         }
 
         await product.save();
@@ -103,7 +102,7 @@ const updateProduct = async (req, res) => {
 
         // Xóa ảnh cũ nếu có ảnh mới
         if (Image && Image.length > 0) {
-            await Image.deleteMany({ Product: id });
+            await Images.deleteMany({ Product: id });
             product.Image = [];
 
             for (const img of Image) {

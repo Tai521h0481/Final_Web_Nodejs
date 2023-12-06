@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema(
   {
-    Barcode: String,
     Name: { type: String, required: true },
+    Barcode: { type: String, required: true },
     ImportPrice: { type: Number, required: true },
     RetailPrice: { type: Number, required: true },
     Category: { type: String, required: true },
