@@ -58,5 +58,6 @@ const OrderDetails = require('./Orderdetails');
 const Orders = require('./Orders');
 const Products = require('./Products');
 const Users = require('./Users');
+const Images = require('./Image');
 
-module.exports = { Customers, OrderDetails, Orders, Products, Users };
+module.exports = { Customers, OrderDetails, Orders, Products, Users, Images };

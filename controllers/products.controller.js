@@ -1,4 +1,4 @@
-const {Products, OrderDetails} = require('../models');
+const {Products, OrderDetails, Images} = require('../models');
 
 const getAllProducts = async (req, res) => {
     try {
@@ -70,7 +70,6 @@ const getProductByBarcode = async (req, res) => {
 
 const createProduct = async (req, res) => {
     let { Name, ImportPrice, RetailPrice, Category, Quantity, Image } = req.body;
-
     try {
         let product = await Products.findOne({ Name });
         if (product) {
@@ -83,7 +82,7 @@ const createProduct = async (req, res) => {
 
         // Xử lý thêm ảnh
         for (const img of Image) {
-            let image = new Image({ Url: img, Product: product.id });
+            let image = new Images({ url: img.url, Product: product.id });
             await image.save();
             product.Image.push(image.id);
         }
@@ -108,7 +107,7 @@ const updateProduct = async (req, res) => {
             product.Image = [];
 
             for (const img of Image) {
-                let image = new Image({ Url: img, Product: id });
+                let image = new Images({ Url: img.url, Product: id }); // Sửa tại đây
                 await image.save();
                 product.Image.push(image.id);
             }
