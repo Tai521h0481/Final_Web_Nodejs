@@ -106,7 +106,7 @@ const updateProduct = async (req, res) => {
             product.Image = [];
 
             for (const img of Image) {
-                let image = new Images({ Url: img.url, Product: id }); // Sửa tại đây
+                let image = new Images({ url: img.url, Product: id });
                 await image.save();
                 product.Image.push(image.id);
             }
