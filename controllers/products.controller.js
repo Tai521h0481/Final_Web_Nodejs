@@ -74,7 +74,7 @@ const createProduct = async (req, res) => {
     try {
         let product = await Products.findOne({ Name });
         if (product) {
-            await Products.findByIdAndUpdate(product._id, { Quantity: product.Quantity + Quantity }, { new: true });
+            await Products.findByIdAndUpdate(product.id, { Quantity: product.Quantity + Quantity }, { new: true });
             return res.status(200).json(product);
         }
 
@@ -83,9 +83,9 @@ const createProduct = async (req, res) => {
 
         // Xử lý thêm ảnh
         for (const img of images) {
-            let image = new Image({ Url: img, Product: product._id });
+            let image = new Image({ Url: img, Product: product.id });
             await image.save();
-            product.Image.push(image._id);
+            product.Image.push(image.id);
         }
 
         await product.save();
@@ -110,7 +110,7 @@ const updateProduct = async (req, res) => {
             for (const img of newImages) {
                 let image = new Image({ Url: img, Product: id });
                 await image.save();
-                product.Image.push(image._id);
+                product.Image.push(image.id);
             }
         }
 
