@@ -9,7 +9,7 @@ const ProductSchema = new Schema(
     RetailPrice: { type: Number, required: true },
     Category: { type: String, required: true },
     Quantity: { type: Number, required: true },
-    Image: [{ type: String, required: true }],
+    Image: [{ type: Schema.Types.ObjectId, ref: "Image"}],
     Flag: { type: Number, default: 0 },
     OrderDetails: [
       { type: Schema.Types.ObjectId, ref: "OrderDetail", required: true },
