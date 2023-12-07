@@ -203,11 +203,9 @@ const changePasswordByEmail = async (req, res) => {
     }
     Email = Email.toLowerCase();
     if (Email !== decode.data.Username) {
-      res
-        .status(401)
-        .json({
-          message: `You are not allowed to change password for ${Email}`,
-        });
+      res.status(401).json({
+        message: `You are not allowed to change password for ${Email}`,
+      });
       return;
     }
     const user = await Users.findOne({ Username: Email });
@@ -236,7 +234,7 @@ const changePasswordByEmail = async (req, res) => {
 };
 
 const changePasswordById = async (req, res) => {
-  const id = req.user.data._id;
+  const id = req.user.data.id;
   const { Password, newPassword } = req.body;
   try {
     const user = await Users.findOne({ _id: id, Password });
