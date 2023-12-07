@@ -127,9 +127,8 @@ const login = async (req, res) => {
 }
 
 const upLoadAvatar = async (req, res) => {
-    const { file } = req;
-    const urlImg = file?.path;
     const id = req.params.id || req.body.id || req.query.id;
+    const { Image } = req.body;
     try {
         const user = await Users.findByIdAndUpdate(id, { Profile_Picture: urlImg }, { new: true }).select('-Password');
         const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
@@ -202,7 +201,7 @@ const changePasswordByEmail = async (req, res) => {
 }
 
 const changePasswordById = async (req, res) => {
-    const id = req.params.id || req.body.id || req.query.id;
+    const id = req.user.data.id;
     const { Password, newPassword } = req.body;
     try {
         const user = await Users.findOne({ _id: id, Password });

@@ -20,9 +20,9 @@ usersRouter.post('/logout', authentication, logout_removeCookie);
 // Xem thông tin hồ sơ của người dùng hiện tại. (đã test)
 usersRouter.get('/profiles/:id', authentication, isExistId(Users), isActive, getUserById);
 //Cập nhật password của người dùng hiện tại. (đã test)
-usersRouter.patch('/profiles/changePassword/:id',authentication, isExistId(Users), isActive, validateInput(['Password', 'newPassword']), changePasswordById);
+usersRouter.patch('/profiles/changePassword',authentication, isExistId(Users), isActive, validateInput(['Password', 'newPassword']), changePasswordById);
 //Cập nhật avatar của người dùng hiện tại (nhận từ body dạng formData) (đã test)
-usersRouter.patch('/profiles/avatars/:id', authentication, isExistId(Users), isActive, uploadAvatar.single('avatars'), upLoadAvatar);
+usersRouter.patch('/profiles/avatars/:id', authentication, isExistId(Users), isActive, upLoadAvatar);
 // Tạo một tài khoản mới (chỉ dành cho quản trị viên). (đã test)
 usersRouter.post('/register', authentication, authorization(["admin"]), validateInput(['Fullname', 'Email']) , isCreated(Users), createUser);
 // Lấy danh sách tất cả người dùng (chỉ dành cho quản trị viên). (đã test)
