@@ -79,7 +79,8 @@ const getEmployeeOrderHistory = async (req, res) => {
         const ordersWithSize = orders.map(order => ({
             ...order._doc,
             OrderDetailSize: order.OrderDetails.length,
-            CustomerName: order.Customer.Fullname
+            CustomerName: order.Customer.Fullname,
+            CustomerPhoneNumber: order.Customer.PhoneNumber
         }));
 
         res.status(200).json({ orders: ordersWithSize });
