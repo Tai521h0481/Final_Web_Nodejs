@@ -25,12 +25,12 @@ const createOrder = async (req, res) => {
     const { Customer, ListProduct } = req.body;
     const { TotalAmount, AmountPaidByCustomer } = Customer;
     try {
+        const employee = await Users.findById(user.data.id);
         let customer = await Customers.findOne({ PhoneNumber: Customer.PhoneNumber });
         if (!customer) {
             const {Fullname, PhoneNumber, Address} = Customer;
             customer = await Customers.create({Fullname, PhoneNumber, Address});
         }
-        console.log(customer);
         let order = await Orders.create({
             Customer : customer._id,
             User: user.data.id,
@@ -38,8 +38,10 @@ const createOrder = async (req, res) => {
             AmountPaidByCustomer,
             ChangeReturnedToCustomer: AmountPaidByCustomer - TotalAmount
         });
+        employee.Orders.push(order.id);
         customer.Orders.push(order.id);
         await customer.save();
+        await employee.save();
         for (const item of ListProduct) {
             const orderDetail = await OrderDetails.create({
                 Order: order._id,
