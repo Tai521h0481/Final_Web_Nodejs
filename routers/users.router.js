@@ -18,7 +18,7 @@ usersRouter.patch('/employees/:Email', authentication, validateInput(['Password'
 //Đăng xuất khỏi hệ thống. (đã test)
 usersRouter.post('/logout', authentication, logout_removeCookie);
 // Xem thông tin hồ sơ của người dùng hiện tại. (đã test)
-usersRouter.get('/profiles/:id', authentication, isExistId(Users), isActive, getUserById);
+usersRouter.get('/profiles', authentication, isActive, getUserById);
 //Cập nhật password của người dùng hiện tại. (đã test)
 usersRouter.patch('/profiles/changePassword',authentication, isActive, validateInput(['Password', 'newPassword']), changePasswordById);
 //Cập nhật avatar của người dùng hiện tại (nhận từ body dạng formData) (đã test)
