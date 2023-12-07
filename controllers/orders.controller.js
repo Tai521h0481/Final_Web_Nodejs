@@ -64,26 +64,27 @@ const createOrder = async (req, res) => {
 const getEmployeeOrderHistory = async (req, res) => {
     const userId = req.params.id || req.body.id || req.query.id;
     const { user } = req;
-    if(user.data.Role !== 'admin' && user.data.id !== userId){
-        return res.status(401).json({ message: 'You do not have permission' });
-    }
+
     try {
-        const orders = await Orders.aggregate([
-            { $match: { User: new mongoose.Types.ObjectId(userId) } }, // Corrected line
-            {
-                $lookup: {
-                    from: "orderdetails",
-                    localField: "_id",
-                    foreignField: "Order",
-                    as: "OrderDetails"
-                }
-            }
-        ]);
-        res.status(200).json({orders});
+        // Check if the user is an admin or the same user as the requested order history
+        if (user.data.Role !== 'admin' && user.data.id !== userId) {
+            return res.status(401).json({ message: 'You do not have permission' });
+        }
+
+        const orders = await Orders.find({ User: userId }).populate('Customer');
+
+        // Calculate and add the size of the OrderDetails array for each order
+        const ordersWithSize = orders.map(order => ({
+            ...order._doc,
+            OrderDetailSize: order.OrderDetails.length
+        }));
+
+        res.status(200).json({ orders: ordersWithSize });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
+
 
 module.exports = {
     getAllOrders,
