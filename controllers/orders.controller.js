@@ -31,7 +31,7 @@ const createOrder = async (req, res) => {
             customer = await Customers.create({FullName, PhoneNumber, Address});
         }
         let order = await Orders.create({
-            Customer : customer.id,
+            Customer : customer._id,
             User: user.data.id,
             TotalAmount,
             AmountPaidByCustomer,
@@ -45,10 +45,10 @@ const createOrder = async (req, res) => {
                 Product: item.id,
                 Quantity: item.Flag,
             });
-            order.OrderDetails.push(orderDetail.id);
+            order.OrderDetails.push(orderDetail._id);
             await order.save();
         }
-        const orderWithDetails = await Orders.findById(order.id)
+        const orderWithDetails = await Orders.findById(order._id)
             .populate({
                 path: 'OrderDetails',
                 populate: { path: 'Product' }
