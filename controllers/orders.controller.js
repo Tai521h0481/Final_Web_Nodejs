@@ -61,7 +61,10 @@ const createOrder = async (req, res) => {
 
 const getEmployeeOrderHistory = async (req, res) => {
     const userId = req.params.id || req.body.id || req.query.id;
-
+    const { user } = req;
+    if(user.data.Role !== 'admin' && user.data.id !== userId){
+        return res.status(401).json({ message: 'You do not have permission' });
+    }
     try {
         const orders = await Orders.aggregate([
             { $match: { User: new mongoose.Types.ObjectId(userId) } }, // Corrected line
