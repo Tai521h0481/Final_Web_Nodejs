@@ -136,7 +136,7 @@ const deleteProduct = async (req, res) => {
         }
 
         // Xóa các ảnh liên quan trước khi xóa sản phẩm
-        await Image.deleteMany({ Product: id });
+        await Images.deleteMany({ Product: id });
 
         const product = await Products.findByIdAndDelete(id);
         if(product){
