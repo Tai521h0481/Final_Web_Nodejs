@@ -143,7 +143,7 @@ const login = async (req, res) => {
 };
 
 const upLoadAvatar = async (req, res) => {
-  const id = req.params.id || req.body.id || req.query.id;
+  const id = req.user.data.id;
   const { imageUrl } = req.body;
   try {
     const user = await Users.findByIdAndUpdate(
