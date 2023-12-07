@@ -5,7 +5,7 @@ require('dotenv').config();
 const {Users} = require('../models');
 const {createUser, getAllUsers, getUserById, login, logout_removeCookie,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
-    , toggleLock} = require('../controllers/users.controller');
+    , toggleLock, getImageByUser} = require('../controllers/users.controller');
 const {uploadAvatar} = require('../middlewares/upload/uploadImage');
 const {isCreated, isExistId, validateInput, isExistEmail, isActive, checkIsNewEmployee} = require('../middlewares/validations/validation');
 const {authentication} = require('../middlewares/authentication/authentication');
@@ -22,7 +22,7 @@ usersRouter.get('/profiles/:id', authentication, isExistId(Users), isActive, get
 //Cập nhật password của người dùng hiện tại. (đã test)
 usersRouter.patch('/profiles/changePassword',authentication, isActive, validateInput(['Password', 'newPassword']), changePasswordById);
 //Cập nhật avatar của người dùng hiện tại (nhận từ body dạng formData) (đã test)
-usersRouter.patch('/profiles/avatars/:id', authentication, isExistId(Users), isActive, upLoadAvatar);
+usersRouter.patch('/profiles/avatars', authentication, isActive, upLoadAvatar);
 // Tạo một tài khoản mới (chỉ dành cho quản trị viên). (đã test)
 usersRouter.post('/register', authentication, authorization(["admin"]), validateInput(['Fullname', 'Email']) , isCreated(Users), createUser);
 // Lấy danh sách tất cả người dùng (chỉ dành cho quản trị viên). (đã test)
@@ -34,4 +34,5 @@ usersRouter.post('/resendEmail', authentication, authorization(["admin"]), valid
 // Mở hoặc khóa tài khoản của người dùng (chỉ dành cho quản trị viên). (đã test)
 usersRouter.patch('/lock/:id', authentication, authorization(["admin"]), isExistId(Users), toggleLock);
 
+usersRouter.get('/avatar/getAvatar', authentication, getImageByUser);
 module.exports = usersRouter;

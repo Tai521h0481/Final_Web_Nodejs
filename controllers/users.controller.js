@@ -285,6 +285,16 @@ const toggleLock = async (req, res) => {
   }
 };
 
+const getImageByUser = async (req, res) => {
+    const id = req.user.data.id;
+    try {
+        const user = await Users.findById(id);
+        res.status(200).json({imageUrl: user.Profile_Picture});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}; 
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -296,4 +306,5 @@ module.exports = {
   changePasswordById,
   resendEmail,
   toggleLock,
+  getImageByUser
 };
