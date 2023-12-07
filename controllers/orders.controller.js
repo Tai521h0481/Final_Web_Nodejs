@@ -28,7 +28,7 @@ const createOrder = async (req, res) => {
         let customer = await Customers.findOne({ PhoneNumber: Customer.PhoneNumber });
         if (!customer) {
             const {Fullname, PhoneNumber, Address} = Customer;
-            customer = await Customers.create({FullName, PhoneNumber, Address});
+            customer = await Customers.create({Fullname, PhoneNumber, Address});
         }
         console.log(customer);
         let order = await Orders.create({
