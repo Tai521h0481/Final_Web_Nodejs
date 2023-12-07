@@ -41,8 +41,8 @@ const createOrder = async (req, res) => {
         await customer.save();
         for (const item of ListProduct) {
             const orderDetail = await OrderDetails.create({
-                Order: order.id,
-                Product: item.id,
+                Order: order._id,
+                Product: item._id,
                 Quantity: item.Flag,
             });
             order.OrderDetails.push(orderDetail._id);
