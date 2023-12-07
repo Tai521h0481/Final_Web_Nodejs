@@ -113,7 +113,7 @@ const login = async (req, res) => {
     let { Email, Password } = req.body;
     try {
         Email = Email.toLowerCase();
-        const user = await Users.findOneAndUpdate({ Username: Email, Password}, {IsOnline: true, FirstLogin: true}, {new: true}).select('-Password');
+        const user = await Users.findOneAndUpdate({ Username: Email, Password}, {IsOnline: true, FirstLogin: true}, {new: true}).select('-Password').populate('Orders');
         if(!user){
             res.status(401).json({ message: 'Email or password is incorrect' });
             return;
