@@ -16,7 +16,7 @@ const {authorization} = require('../middlewares/authorization/authorization');
 
 const authMiddleware  = [authentication, authorization(['employee']), isActive];
 
-ordersRouter.post('/', ...authMiddleware, validateInput(['TotalAmount', 'AmountPaidByCustomer', 'Customer']), createOrder);
+ordersRouter.post('/', ...authMiddleware, validateInput(['Customer', 'ListProduct']), createOrder);
 // Lấy danh sách tất cả đơn hàng.
 ordersRouter.get('/' , ...authMiddleware, getAllOrders);
 // Lấy thông tin của một đơn hàng cụ thể.

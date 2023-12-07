@@ -79,8 +79,8 @@ const getEmployeeOrderHistory = async (req, res) => {
                 }
             }
         ]);
-
-        res.status(200).json(orders);
+        const customer = await Customers.findById(orders.Customer.toString()); 
+        res.status(200).json({orders, customer});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
