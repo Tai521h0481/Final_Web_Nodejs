@@ -144,11 +144,11 @@ const login = async (req, res) => {
 
 const upLoadAvatar = async (req, res) => {
   const id = req.params.id || req.body.id || req.query.id;
-  const { Image } = req.body;
+  const { imageUrl } = req.body;
   try {
     const user = await Users.findByIdAndUpdate(
       id,
-      { Profile_Picture: urlImg },
+      { Profile_Picture: imageUrl },
       { new: true }
     ).select("-Password");
     const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
