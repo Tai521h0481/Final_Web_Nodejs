@@ -22,14 +22,16 @@ const getOrderById = async (req, res) => {
 
 const createOrder = async (req, res) => {
     let { user } = req;
-    const { TotalAmount, AmountPaidByCustomer, Customer, ListProduct } = req.body;
+    const { Customer, ListProduct } = req.body;
+    const { TotalAmount, AmountPaidByCustomer } = Customer;
     try {
-        const customer = await Customers.findById(Customer);
+        let customer = await Customers.findOne({ PhoneNumber: Customer.PhoneNumber });
         if (!customer) {
-            return res.status(404).json({ message: "Khách hàng không tồn tại" });
+            const {FullName, PhoneNumber, Address} = Customer;
+            customer = await Customers.create({FullName, PhoneNumber, Address});
         }
         let order = await Orders.create({
-            Customer,
+            Customer : customer.id,
             User: user.data.id,
             TotalAmount,
             AmountPaidByCustomer,
