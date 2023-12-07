@@ -27,8 +27,8 @@ const createOrder = async (req, res) => {
     try {
         let customer = await Customers.findOne({ PhoneNumber: Customer.PhoneNumber });
         if (!customer) {
-            const {FullName, PhoneNumber, Address} = Customer;
-            customer = await Customers.create({FullName, PhoneNumber, Address});
+            const {Fullname, PhoneNumber, Address} = Customer;
+            customer = await Customers.create({Fullname, PhoneNumber, Address});
         }
         let order = await Orders.create({
             Customer : customer._id,
@@ -78,8 +78,7 @@ const getEmployeeOrderHistory = async (req, res) => {
                 }
             }
         ]);
-        const customer = await Customers.findById(orders.Customer.toString()); 
-        res.status(200).json({orders, customer});
+        res.status(200).json({orders});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
