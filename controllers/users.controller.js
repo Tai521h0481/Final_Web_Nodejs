@@ -153,7 +153,7 @@ const upLoadAvatar = async (req, res) => {
     ).select("-Password");
     const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
     res.cookie("token", token, { maxAge: timeToken });
-    res.status(200).send({ message: `Upload avatar successfully` });
+    res.status(200).send({ user });
   } catch (error) {
     res.status(500).send(error);
   }
