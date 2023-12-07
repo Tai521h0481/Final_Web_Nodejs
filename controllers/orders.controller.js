@@ -68,13 +68,17 @@ const getEmployeeOrderHistory = async (req, res) => {
     const { user } = req;
 
     try {
-        // Check if the user is an admin or the same user as the requested order history
         if (user.data.Role !== 'admin' && user.data.id !== userId) {
             return res.status(401).json({ message: 'You do not have permission' });
         }
 
-        const orders = await Orders.find({ User: userId }).populate('Customer');
-
+        const orders = await Orders.find({ User: userId }).populate('Customer OrderDetails');
+        // populate Product for each OrderDetail
+        for (const order of orders) {
+            for (const orderDetail of order.OrderDetails) {
+                orderDetail.Product = await Products.findById(orderDetail.Product);
+            }
+        }
         // Calculate and add the size of the OrderDetails array for each order
         const ordersWithSize = orders.map(order => ({
             ...order._doc,
