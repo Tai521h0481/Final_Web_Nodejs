@@ -43,7 +43,7 @@ const createOrder = async (req, res) => {
         for (const item of ListProduct) {
             const orderDetail = await OrderDetails.create({
                 Order: order.id,
-                Product: item.ProductId,
+                Product: item._id,
                 Quantity: item.Quantity,
             });
             order.OrderDetails.push(orderDetail.id);
