@@ -76,7 +76,8 @@ const getEmployeeOrderHistory = async (req, res) => {
         // Calculate and add the size of the OrderDetails array for each order
         const ordersWithSize = orders.map(order => ({
             ...order._doc,
-            OrderDetailSize: order.OrderDetails.length
+            OrderDetailSize: order.OrderDetails.length,
+            CustomerName: order.Customer.Fullname
         }));
 
         res.status(200).json({ orders: ordersWithSize });
