@@ -7,42 +7,42 @@ const authentication = (req, res, next) => {
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')
-      ) {
+    ) {
         token = req.headers.authorization.split(' ')[1];
-      }
-    if(token){
+    }
+    if (token) {
         try {
             const decoded = jwt.verify(token, SECRET_key);
-            if(decoded){
+            if (decoded) {
                 req.user = decoded;
                 next();
             }
-            else{
+            else {
                 res.status(401).send("invalid token");
             }
         } catch (error) {
             res.status(401).send(error.message);
         }
-    }else{
+    } else {
         res.status(401).send("required token");
     }
 }
 
 const authenticationLinkLogin = async (req, res, next) => {
-    const {token } = req.params;
+    const { token } = req.params;
     try {
         const decoded = jwt.verify(token, SECRET_key);
-        if(decoded){
+        if (decoded) {
             req.user = decoded;
             next();
         }
-        else{
+        else {
             res.status(401).send("invalid token");
         }
     } catch (error) {
         res.status(401).send(error.message);
+    }
 }
-
 module.exports = {
     authentication,
     authenticationLinkLogin
