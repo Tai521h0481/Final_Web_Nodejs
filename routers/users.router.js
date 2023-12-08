@@ -30,7 +30,7 @@ usersRouter.get('/',authentication, authorization(["admin"]), getAllUsers);
 // Lấy người dùng theo id (chỉ dành cho quản trị viên). (đã test)
 usersRouter.get('/:id', authentication, authorization(["admin"]), isExistId(Users), getUserById);
 // send lại link login cho employee (salesperson) cần truyền Email vào body (đã test)
-usersRouter.post('/resendEmail', authentication, authorization(["admin"]), validateInput(['Email']), isExistEmail(Users), resendEmail);
+usersRouter.post('/resendEmail/:id', authentication, authorization(["admin"]), resendEmail);
 // Mở hoặc khóa tài khoản của người dùng (chỉ dành cho quản trị viên). (đã test)
 usersRouter.patch('/lock/:id', authentication, authorization(["admin"]), isExistId(Users), toggleLock);
 

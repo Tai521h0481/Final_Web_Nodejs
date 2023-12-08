@@ -64,7 +64,17 @@ const sendEmail = (Email) => {
 };
 
 const resendEmail = async (req, res) => {
-  let Email = req.body.Email || req.query.Email || req.params.Email;
+  const id = req.params.id || req.body.id || req.query.id;
+  let Email;
+  try {
+    const user = await Users.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    Email = user.Username;
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
   let responseSent = false;
   try {
     const message = await sendEmail(Email).catch((error) => {
