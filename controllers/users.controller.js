@@ -211,7 +211,7 @@ const changePasswordByEmail = async (req, res) => {
     await user.save();
     user.Password = undefined;
     token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
-    res.status(200).json({ message: "Changed password successfully", token });
+    res.status(200).json({ message: "Changed password successfully", token , user});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
