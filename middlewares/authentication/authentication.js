@@ -32,6 +32,7 @@ const authenticationLinkLogin = async (req, res, next) => {
     const { token } = req.body;
     try {
         const decoded = jwt.verify(token, SECRET_key);
+        console.log(decoded);
         if (decoded) {
             req.user = decoded;
             next();

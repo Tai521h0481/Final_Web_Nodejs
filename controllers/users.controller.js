@@ -73,8 +73,9 @@ const sendEmail = (Email, Title, Content) => {
 const resendEmail = async (req, res) => {
   const id = req.params.id || req.body.id || req.query.id;
   let Email;
+  let user;
   try {
-    const user = await Users.findById(id);
+    user = await Users.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -85,8 +86,7 @@ const resendEmail = async (req, res) => {
   let responseSent = false;
   try {
     Email = Email.toLowerCase();
-    const token = jwt.sign({ Email }, SECRET_key, { expiresIn: "1m" }); // Token expires in 1 minute
-    linkLogin += `?token=${token}`;
+    const token = jwt.sign({ Email }, SECRET_key, { expiresIn : "1m" }); // Token expires in 1 minute
     const Title = "Welcome to Our App";
     const Login = linkLogin + `?token=${token}`;
     const Content = `Please click the link to login: ${Login}`;
@@ -126,8 +126,7 @@ const createUser = async (req, res) => {
       Profile_Picture,
     });
     Email = Email.toLowerCase();
-    const token = jwt.sign({ Email }, SECRET_key, { expiresIn: "1m" }); // Token expires in 1 minute
-    linkLogin += `?token=${token}`;
+    const token = jwt.sign({ Email }, SECRET_key, { expiresIn:"1m" }); // Token expires in 1 minute
     const Title = "Welcome to Our App";
     const Login = linkLogin + `?token=${token}`;
     const Content = `Please click the link to login: ${Login}`;
