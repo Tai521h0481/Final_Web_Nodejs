@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const rootRouter = express.Router();
 
 const usersRouter = require('./users.router');
@@ -14,5 +15,11 @@ rootRouter.use('/orders', ordersRouter);
 rootRouter.use('/orderDetails', orderDetailsRouter);
 rootRouter.use('/customers', customersRouter);
 rootRouter.use('/reports', reportsRouter);
+
+const {pageChangePassword} = process.env
+const {authenticationLinkLogin} = require('../middlewares/authentication/authentication');
+rootRouter.post(`${pageChangePassword}/:token`, authenticationLinkLogin, (req, res) => {
+    res.status(200).send("success");
+});
 
 module.exports = rootRouter;

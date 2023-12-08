@@ -14,14 +14,6 @@ app.use("/api", rootRouter);
 
 // demo send linkLogin
 app.use(express.static(__dirname));
-const {
-  authenticationLinkLogin,
-} = require("./middlewares/authentication/authentication");
-const pageChangePassword = process.env.pageChangePassword;
-
-app.post(pageChangePassword + "/:token", authenticationLinkLogin, (req, res) => {
-  res.status(200).send("success");
-});
 
 const { MONGO_URL } = process.env;
 
