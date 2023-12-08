@@ -3,7 +3,7 @@ const usersRouter = express.Router();
 require('dotenv').config();
 
 const {Users} = require('../models');
-const {createUser, getAllUsers, getUserById, login, logout_removeCookie,
+const {createUser, getAllUsers, getUserById, login, logout_removeCookie, getProfile,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
     , toggleLock, getImageByUser} = require('../controllers/users.controller');
 const {uploadAvatar} = require('../middlewares/upload/uploadImage');
@@ -18,7 +18,7 @@ usersRouter.patch('/employees/:Email', authentication, validateInput(['Password'
 //Đăng xuất khỏi hệ thống. (đã test)
 usersRouter.post('/logout', authentication, logout_removeCookie);
 // Xem thông tin hồ sơ của người dùng hiện tại. (đã test)
-usersRouter.get('/profiles', authentication, isActive, getUserById);
+usersRouter.get('/profiles', authentication, isActive, getProfile);
 //Cập nhật password của người dùng hiện tại. (đã test)
 usersRouter.patch('/profiles/changePassword',authentication, isActive, validateInput(['Password', 'newPassword']), changePasswordById);
 //Cập nhật avatar của người dùng hiện tại (nhận từ body dạng formData) (đã test)
