@@ -187,56 +187,13 @@ const upLoadAvatar = async (req, res) => {
   }
 };
 
-const logout_removeCookie = async (req, res) => {
-  const token =
-    req.headers.token ||
-    req.body.token ||
-    req.query.token ||
-    req.cookies?.token;
-  try {
-    if (!token) {
-      res.status(401).json({ message: "You have to login before" });
-    } else {
-      const decode = jwt.verify(token, SECRET_key);
-      if (!decode) {
-        res.status(401).json({ message: "Token is invalid" });
-        return;
-      }
-      await Users.findByIdAndUpdate(decode.data._id, { IsOnline: false });
-      res.clearCookie("token");
-      res.status(200).json({ message: "Logout successfully" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
 const changePasswordByEmail = async (req, res) => {
   let Email = req.body.Email || req.query.Email || req.params.Email;
-  let token =
-    req.headers.token ||
-    req.body.token ||
-    req.query.token ||
-    req.cookies?.token;
   const { Password } = req.body;
   try {
-    if (!token) {
-      res.status(401).json({ message: "You have to login before" });
-      return;
-    }
-    const decode = jwt.verify(token, SECRET_key);
-    if (!decode) {
-      res.status(401).json({ message: "Token is invalid" });
-      return;
-    }
     Email = Email.toLowerCase();
-    if (Email !== decode.data.Username) {
-      res.status(401).json({
-        message: `You are not allowed to change password for ${Email}`,
-      });
-      return;
-    }
-    const user = await Users.findOne({ Username: Email });
+    const user = await Users.findOne({ Email });
     if (user.Password === Password) {
       return res
         .status(401)
@@ -254,8 +211,7 @@ const changePasswordByEmail = async (req, res) => {
     await user.save();
     user.Password = undefined;
     token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
-    res.cookie("token", token, { maxAge: timeToken });
-    res.status(200).json({ message: "Changed password successfully" });
+    res.status(200).json({ message: "Changed password successfully", token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -346,7 +302,6 @@ module.exports = {
   createUser,
   login,
   upLoadAvatar,
-  logout_removeCookie,
   changePasswordByEmail,
   changePasswordById,
   resendEmail,

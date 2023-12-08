@@ -3,7 +3,7 @@ const usersRouter = express.Router();
 require('dotenv').config();
 
 const {Users} = require('../models');
-const {createUser, getAllUsers, getUserById, login, logout_removeCookie, getProfile,
+const {createUser, getAllUsers, getUserById, login, getProfile,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
     , toggleLock, getImageByUser, passwordRecovery} = require('../controllers/users.controller');
 const {uploadAvatar} = require('../middlewares/upload/uploadImage');
@@ -14,9 +14,7 @@ const {authorization} = require('../middlewares/authorization/authorization');
 // Đăng nhập vào hệ thống. (đã test)
 usersRouter.post('/login', checkIsNewEmployee, login);
 // Đổi mật khẩu cho employee mới không cần password cũ (đã test)
-usersRouter.patch('/employees/:Email', authentication, validateInput(['Password']), isExistEmail(Users), changePasswordByEmail);
-//Đăng xuất khỏi hệ thống. (đã test)
-usersRouter.post('/logout', authentication, logout_removeCookie);
+usersRouter.patch('/employees/:Email', validateInput(['Password']), isExistEmail(Users), changePasswordByEmail);
 // Xem thông tin hồ sơ của người dùng hiện tại. (đã test)
 usersRouter.get('/profiles', authentication, isActive, getProfile);
 //Cập nhật password của người dùng hiện tại. (đã test)
