@@ -18,14 +18,10 @@ const {
   authenticationLinkLogin,
 } = require("./middlewares/authentication/authentication");
 const pageChangePassword = process.env.pageChangePassword;
-app.get("/", (req, res) => {
-  res.redirect("/login.html");
+
+app.post(pageChangePassword + "/:token", authenticationLinkLogin, (req, res) => {
+  res.status(200).send("success");
 });
-app.get(pageChangePassword, authenticationLinkLogin, (req, res) => {
-  const token = req.query.token;
-  res.redirect(`/login.html?token=${token}`);
-});
-//
 
 const { MONGO_URL } = process.env;
 
