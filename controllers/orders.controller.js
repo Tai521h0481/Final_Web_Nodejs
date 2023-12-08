@@ -75,7 +75,7 @@ const getEmployeeOrderHistory = async (req, res) => {
 
   try {
     const orders = await Orders.find({ User: userId }).populate(
-      "Customer OrderDetails"
+      "Customer OrderDetails User"
     );
     // populate Product for each OrderDetail
     for (const order of orders) {
@@ -89,6 +89,7 @@ const getEmployeeOrderHistory = async (req, res) => {
       OrderDetailSize: order.OrderDetails.length,
       CustomerName: order.Customer.Fullname,
       CustomerPhoneNumber: order.Customer.PhoneNumber,
+      EmployeeName: order.User.Fullname
     }));
 
     res.status(200).json({ orders: ordersWithSize });
