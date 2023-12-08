@@ -12,6 +12,7 @@ const passMail = process.env.passMail;
 const BASE_URL = process.env.BASE_URL;
 const pageChangePassword = process.env.pageChangePassword;
 const nodemailer = require("nodemailer");
+let linkLogin = `${BASE_URL}${pageChangePassword}`;
 
 let transporter = nodemailer.createTransport({
   service: "hotmail",
@@ -51,16 +52,12 @@ const getProfile = async (req, res) => {
   }
 };
 
-const sendEmail = (Email) => {
-  let linkLogin = `${BASE_URL}${pageChangePassword}`;
-  Email = Email.toLowerCase();
-  const token = jwt.sign({ Email }, SECRET_key, { expiresIn: "1m" }); // Token expires in 1 minute
-  linkLogin += `?token=${token}`;
+const sendEmail = (Email, Title, Content) => {
   let mailOptions = {
     from: userMail,
     to: Email,
-    subject: "Welcome to Our App",
-    text: `Please click the link to login: ${linkLogin}`,
+    subject: Title,
+    text : Content,
   };
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {
@@ -87,7 +84,13 @@ const resendEmail = async (req, res) => {
   }
   let responseSent = false;
   try {
-    const message = await sendEmail(Email).catch((error) => {
+    Email = Email.toLowerCase();
+    const token = jwt.sign({ Email }, SECRET_key, { expiresIn: "1m" }); // Token expires in 1 minute
+    linkLogin += `?token=${token}`;
+    const Title = "Welcome to Our App";
+    const Login = linkLogin + `?token=${token}`;
+    const Content = `Please click the link to login: ${Login}`;
+    const message = await sendEmail(Email, Title, Content).catch((error) => {
       if (!responseSent) {
         res.status(500).json({ message: error.message });
         responseSent = true;
@@ -122,7 +125,13 @@ const createUser = async (req, res) => {
       Password,
       Profile_Picture,
     });
-    const message = await sendEmail(Email).catch((error) => {
+    Email = Email.toLowerCase();
+    const token = jwt.sign({ Email }, SECRET_key, { expiresIn: "1m" }); // Token expires in 1 minute
+    linkLogin += `?token=${token}`;
+    const Title = "Welcome to Our App";
+    const Login = linkLogin + `?token=${token}`;
+    const Content = `Please click the link to login: ${Login}`;
+    const message = await sendEmail(Email, Title, Content).catch((error) => {
       if (!responseSent) {
         res.status(500).json({ message: error.message });
         responseSent = true;
@@ -306,14 +315,31 @@ const toggleLock = async (req, res) => {
 };
 
 const getImageByUser = async (req, res) => {
-    const id = req.user.data.id;
-    try {
-        const user = await Users.findById(id);
-        res.status(200).json(user.Profile_Picture);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+  const id = req.user.data.id;
+  try {
+    const user = await Users.findById(id);
+    res.status(200).json(user.Profile_Picture);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const passwordRecovery = async (req, res) => {
+  let Email = req.body.Email || req.query.Email || req.params.Email;
+  try {
+    const user = await Users.findOne({ Email });
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
     }
-}; 
+    Email = Email.toLowerCase();
+    const Title = "Password Recovery";
+    const Content = `Your password is: ${user.Password}`;
+    const message = await sendEmail(Email, Title, Content);
+    res.status(200).json({ message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 module.exports = {
   getAllUsers,
@@ -327,5 +353,6 @@ module.exports = {
   resendEmail,
   toggleLock,
   getImageByUser,
-  getProfile
+  getProfile,
+  passwordRecovery
 };

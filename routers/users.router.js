@@ -5,7 +5,7 @@ require('dotenv').config();
 const {Users} = require('../models');
 const {createUser, getAllUsers, getUserById, login, logout_removeCookie, getProfile,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
-    , toggleLock, getImageByUser} = require('../controllers/users.controller');
+    , toggleLock, getImageByUser, passwordRecovery} = require('../controllers/users.controller');
 const {uploadAvatar} = require('../middlewares/upload/uploadImage');
 const {isCreated, isExistId, validateInput, isExistEmail, isActive, checkIsNewEmployee} = require('../middlewares/validations/validation');
 const {authentication} = require('../middlewares/authentication/authentication');
@@ -35,4 +35,7 @@ usersRouter.post('/resendEmail/:id', authentication, authorization(["admin"]), r
 usersRouter.patch('/lock/:id', authentication, authorization(["admin"]), isExistId(Users), toggleLock);
 
 usersRouter.get('/avatar/getAvatar', authentication, getImageByUser);
+// 
+usersRouter.post('/recover-password/:Email', authentication, authorization(["admin"]), passwordRecovery);
+
 module.exports = usersRouter;
