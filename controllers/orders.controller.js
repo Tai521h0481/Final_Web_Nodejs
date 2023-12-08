@@ -72,13 +72,8 @@ const createOrder = async (req, res) => {
 
 const getEmployeeOrderHistory = async (req, res) => {
   const userId = req.params.id || req.body.id || req.query.id;
-  const { user } = req;
 
   try {
-    // if (user.data.Role !== 'admin' && user.data.id !== userId) {
-    //     return res.status(401).json({ message: 'You do not have permission' });
-    // }
-
     const orders = await Orders.find({ User: userId }).populate(
       "Customer OrderDetails"
     );
@@ -102,10 +97,35 @@ const getEmployeeOrderHistory = async (req, res) => {
   }
 };
 
+const getCustomerOrderHistory = async (req, res) => {
+    const CustomerId = req.params.id || req.body.id || req.query.id;
+    try {
+        const orders = await Orders.find({Customer: CustomerId}).populate('Customer OrderDetails User');
+        // populate Product for each OrderDetail
+        for (const order of orders) {
+            for (const orderDetail of order.OrderDetails) {
+                orderDetail.Product = await Products.findById(orderDetail.Product);
+            }
+        }
+        // Calculate and add the size of the OrderDetails array for each order
+        const ordersWithSize = orders.map(order => ({
+            ...order._doc,
+            OrderDetailSize: order.OrderDetails.length,
+            CustomerName: order.Customer.Fullname,
+            CustomerPhoneNumber: order.Customer.PhoneNumber,
+            EmployeeName: order.User.Fullname
+        }));
+
+        res.status(200).json({orders: ordersWithSize});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
 module.exports = {
     getAllOrders,
     getOrderById,
     createOrder,
-    getEmployeeOrderHistory
+    getEmployeeOrderHistory,
+    getCustomerOrderHistory
 }
