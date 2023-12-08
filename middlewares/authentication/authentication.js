@@ -29,7 +29,7 @@ const authentication = (req, res, next) => {
 }
 
 const authenticationLinkLogin = async (req, res, next) => {
-    const { token } = req.params;
+    const { token } = req.body;
     try {
         const decoded = jwt.verify(token, SECRET_key);
         if (decoded) {

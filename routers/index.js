@@ -18,7 +18,7 @@ rootRouter.use('/reports', reportsRouter);
 
 const {pageChangePassword} = process.env
 const {authenticationLinkLogin} = require('../middlewares/authentication/authentication');
-rootRouter.post(`${pageChangePassword}/:token`, authenticationLinkLogin, (req, res) => {
+rootRouter.post(`${pageChangePassword}`, authenticationLinkLogin, (req, res) => {
     res.status(200).send("success");
 });
 
