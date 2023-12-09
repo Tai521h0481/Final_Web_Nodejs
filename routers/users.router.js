@@ -5,7 +5,7 @@ require('dotenv').config();
 const {Users} = require('../models');
 const {createUser, getAllUsers, getUserById, login, getProfile,
      upLoadAvatar, changePasswordByEmail, changePasswordById, resendEmail
-    , toggleLock, getImageByUser, passwordRecovery} = require('../controllers/users.controller');
+    , toggleLock, getImageByUser, passwordRecovery, logout} = require('../controllers/users.controller');
 const {uploadAvatar} = require('../middlewares/upload/uploadImage');
 const {isCreated, isExistId, validateInput, isExistEmail, isActive, checkIsNewEmployee} = require('../middlewares/validations/validation');
 const {authentication} = require('../middlewares/authentication/authentication');
@@ -31,6 +31,9 @@ usersRouter.get('/:id', authentication, authorization(["admin"]), isExistId(User
 usersRouter.post('/resendEmail/:id', authentication, authorization(["admin"]), resendEmail);
 // Mở hoặc khóa tài khoản của người dùng (chỉ dành cho quản trị viên). (đã test)
 usersRouter.patch('/lock/:id', authentication, authorization(["admin"]), isExistId(Users), toggleLock);
+
+// logout
+usersRouter.post("/logout", authentication, logout);
 
 usersRouter.get('/avatar/getAvatar', authentication, getImageByUser);
 // 

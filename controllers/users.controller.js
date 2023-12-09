@@ -300,6 +300,20 @@ const passwordRecovery = async (req, res) => {
   }
 }
 
+const logout = async (req, res) => {
+  const id = req.user.data.id;
+  try {
+    const user = await Users.findByIdAndUpdate(
+      id,
+      { IsOnline: false },
+      { new: true }
+    );
+    res.status(200).json({ message: "Logout successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -312,5 +326,6 @@ module.exports = {
   toggleLock,
   getImageByUser,
   getProfile,
-  passwordRecovery
+  passwordRecovery,
+  logout
 };
