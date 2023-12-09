@@ -14,7 +14,7 @@ const {authorization} = require('../middlewares/authorization/authorization');
 // Đăng nhập vào hệ thống. (đã test)
 usersRouter.post('/login', checkIsNewEmployee, login);
 // Đổi mật khẩu cho employee mới không cần password cũ (đã test)
-usersRouter.patch('/employees/:Email', validateInput(['Password']), isExistEmail(Users), changePasswordByEmail);
+usersRouter.patch('/employees/firstChangePassword', validateInput(['Password']), isExistEmail(Users), changePasswordByEmail);
 // Xem thông tin hồ sơ của người dùng hiện tại. (đã test)
 usersRouter.get('/profiles', authentication, isActive, getProfile);
 //Cập nhật password của người dùng hiện tại. (đã test)
