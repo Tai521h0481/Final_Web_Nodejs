@@ -19,7 +19,7 @@ rootRouter.use('/reports', reportsRouter);
 const {pageChangePassword} = process.env
 const {authenticationLinkLogin} = require('../middlewares/authentication/authentication');
 rootRouter.post(`${pageChangePassword}`, authenticationLinkLogin, (req, res) => {
-    res.status(200).json({message: 'success', user: req.user});
+    res.status(200).json({message: 'success', email: req.user.Email});
 });
 
 module.exports = rootRouter;
