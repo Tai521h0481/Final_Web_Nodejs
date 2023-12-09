@@ -1,7 +1,7 @@
 const { Products, Orders, OrderDetails, Users, Customers } = require('../models');
 
 const getReport = async (start, end, user) => {
-    const orders = await Orders.aggregate([
+    let orders = await Orders.aggregate([
         {
             $match: {
                 createdAt: {
@@ -60,8 +60,7 @@ const getReport = async (start, end, user) => {
     let totalProducts = 0;
     let totalProfit = 0;
 
-    orders.forEach(order => {
-        totalAmountReceived += order.TotalAmount;
+    for (const order of orders) {
         order.OrderDetails.forEach(detail => {
             if (detail && detail.Product) {
                 const cost = detail.Product.ImportPrice * detail.Quantity;
@@ -69,7 +68,16 @@ const getReport = async (start, end, user) => {
                 totalProducts += detail.Quantity;
             }
         });
-    });
+
+        const user = await Users.findById(order.User);
+        const customer = await Customers.findById(order.Customer);
+
+        order.EmployeeName = user.Fullname;
+        order.CustomerName = customer.Fullname;
+        order.CustomerPhoneNumber = customer.PhoneNumber;
+
+        totalAmountReceived += order.TotalAmount;
+    }
 
     const report = {
         totalAmountReceived,
