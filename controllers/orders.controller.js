@@ -59,6 +59,7 @@ const createOrder = async (req, res) => {
       });
       order.OrderDetails.push(orderDetail._id);
       await order.save();
+      await Products.findById(item._id).updateOne({ $inc: { Quantity: -item.Flag } })
     }
     const orderWithDetails = await Orders.findById(order._id).populate({
       path: "OrderDetails",

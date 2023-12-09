@@ -29,7 +29,7 @@ reportsRouter.get('/this-week', ...authMiddleware, getReportThisWeek);
 // lấy Lấy báo cáo bán hàng trong tháng
 reportsRouter.get('/this-month', ...authMiddleware, getReportThisMonth);
 // lấy Lấy báo cáo bán hàng from - to
-reportsRouter.get('/from-to', ...authMiddleware, getReportFromTo);
+reportsRouter.post('/from-to', ...authMiddleware, getReportFromTo);
 // lấy Lấy báo cáo bán hàng theo tháng
 reportsRouter.get('/monthly-order-counts', ...authMiddleware, getMonthlyOrderCounts);
 // lấy báo cáo hiện lên dashboard
