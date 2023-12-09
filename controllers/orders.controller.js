@@ -6,6 +6,7 @@ const {
   Products,
 } = require("../models");
 const mongoose = require("mongoose");
+const { startOfMonth, endOfMonth, format } = require('date-fns');
 
 const getAllOrders = async (req, res) => {
   try {
@@ -99,34 +100,73 @@ const getEmployeeOrderHistory = async (req, res) => {
 };
 
 const getCustomerOrderHistory = async (req, res) => {
-    const CustomerId = req.params.id || req.body.id || req.query.id;
-    try {
-        const orders = await Orders.find({Customer: CustomerId}).populate('Customer OrderDetails User');
-        // populate Product for each OrderDetail
-        for (const order of orders) {
-            for (const orderDetail of order.OrderDetails) {
-                orderDetail.Product = await Products.findById(orderDetail.Product);
-            }
-        }
-        // Calculate and add the size of the OrderDetails array for each order
-        const ordersWithSize = orders.map(order => ({
-            ...order._doc,
-            OrderDetailSize: order.OrderDetails.length,
-            CustomerName: order.Customer.Fullname,
-            CustomerPhoneNumber: order.Customer.PhoneNumber,
-            EmployeeName: order.User.Fullname
-        }));
-
-        res.status(200).json({orders: ordersWithSize});
-    } catch (error) {
-        res.status(500).json({message: error.message});
+  const CustomerId = req.params.id || req.body.id || req.query.id;
+  try {
+    const orders = await Orders.find({ Customer: CustomerId }).populate('Customer OrderDetails User');
+    // populate Product for each OrderDetail
+    for (const order of orders) {
+      for (const orderDetail of order.OrderDetails) {
+        orderDetail.Product = await Products.findById(orderDetail.Product);
+      }
     }
+    // Calculate and add the size of the OrderDetails array for each order
+    const ordersWithSize = orders.map(order => ({
+      ...order._doc,
+      OrderDetailSize: order.OrderDetails.length,
+      CustomerName: order.Customer.Fullname,
+      CustomerPhoneNumber: order.Customer.PhoneNumber,
+      EmployeeName: order.User.Fullname
+    }));
+
+    res.status(200).json({ orders: ordersWithSize });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+const getFiveOrders = async (req, res) => {
+  const { user } = req;
+  try {
+    let orders;
+    if (user.data.Role === 'admin') {
+      orders = await Orders.find().populate('User').sort({ createdAt: -1 }).limit(5);
+    } else {
+      orders = await Orders.find({ User: user.data.id }).populate('User').sort({ createdAt: -1 }).limit(5);
+    }
+    let returnOrders = [];
+    for (let order of orders) {
+      let returnOrder = {};
+      returnOrder.TotalAmount = order.TotalAmount;
+      returnOrder.EmployeeName = order.User.Fullname;
+      returnOrder.Avatar = order.User.Profile_Picture;
+      returnOrder.Email = order.User.Email;
+      returnOrders.push(returnOrder);
+    }
+    let totalOrderInMonth = 0;
+    if (user.data.Role === 'employee') {
+      const currentDate = new Date();
+      const startOfMonthDate = startOfMonth(currentDate);
+      const endOfMonthDate = endOfMonth(currentDate);
+
+      const ordersInMonth = await Orders.find({
+        User: user.data.id,
+        createdAt: { $gte: startOfMonthDate, $lte: endOfMonthDate }
+      });
+
+      totalOrderInMonth = ordersInMonth.length;
+    }
+    returnOrders = { totalOrderInMonth, orders: returnOrders };
+    res.status(200).json({ data: returnOrders });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 }
 
 module.exports = {
-    getAllOrders,
-    getOrderById,
-    createOrder,
-    getEmployeeOrderHistory,
-    getCustomerOrderHistory
+  getAllOrders,
+  getOrderById,
+  createOrder,
+  getEmployeeOrderHistory,
+  getCustomerOrderHistory,
+  getFiveOrders
 }
