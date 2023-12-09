@@ -40,11 +40,7 @@ reportsRouter.get("/this-week", ...authMiddleware, getReportThisWeek);
 // lấy Lấy báo cáo bán hàng trong tháng
 reportsRouter.get("/this-month", ...authMiddleware, getReportThisMonth);
 // lấy Lấy báo cáo bán hàng from - to
-<<<<<<< HEAD
 reportsRouter.post('/from-to', ...authMiddleware, getReportFromTo);
-=======
-reportsRouter.post("/from-to", ...authMiddleware, getReportFromTo);
->>>>>>> efaa484cb2497003f6c9e1e5f742fa07c0e176f3
 // lấy Lấy báo cáo bán hàng theo tháng
 reportsRouter.get(
   "/monthly-order-counts",
