@@ -6,6 +6,8 @@ const CustomerSchema = new Schema({
   PhoneNumber: String,
   Address: String,
   Orders: [{ type: Schema.Types.ObjectId, ref: 'Order', required: true }]
+},{
+  timestamps: true
 }, {
   toJSON: {
       virtuals: true, 

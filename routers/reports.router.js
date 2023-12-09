@@ -3,7 +3,7 @@ const reportsRouter  = express.Router();
 require('dotenv').config();
 
 
-const {getReportToday,
+const {getReportToday, getMonthlyOrderCounts, getDashboardMetrics,
     getReportYesterday,
     getReportThisWeek,
     getReportThisMonth,
@@ -30,6 +30,10 @@ reportsRouter.get('/this-week', ...authMiddleware, getReportThisWeek);
 reportsRouter.get('/this-month', ...authMiddleware, getReportThisMonth);
 // lấy Lấy báo cáo bán hàng from - to
 reportsRouter.get('/from-to', ...authMiddleware, getReportFromTo);
+// lấy Lấy báo cáo bán hàng theo tháng
+reportsRouter.get('/monthly-order-counts', ...authMiddleware, getMonthlyOrderCounts);
+// lấy báo cáo hiện lên dashboard
+reportsRouter.get('/dashboard-metrics', ...authMiddleware, getDashboardMetrics);
 
 
 module.exports = reportsRouter;
