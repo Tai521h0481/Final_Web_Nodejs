@@ -159,8 +159,10 @@ const login = async (req, res) => {
       .select("-Password")
       .populate("Orders");
     if (!user) {
-      res.status(401).json({ message: "Email or password is incorrect" });
-      return;
+      return res.status(401).json({ message: "Email or password is incorrect" });
+    }
+    else if(user.IsLocked === true) {
+      return res.status(401).json({ message: "Your account has been locked" });
     }
     const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
     res.cookie("token", token, { maxAge: timeToken });
