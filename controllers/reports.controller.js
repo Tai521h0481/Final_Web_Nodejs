@@ -124,13 +124,33 @@ const getReportYesterday = async (req, res) => {
     }
 }
 
+// const getReportThisWeek = async (req, res) => {
+//     const { user } = req;
+//     let startOfWeek = new Date();
+//     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+//     let endOfWeek = new Date();
+//     endOfWeek.setDate(endOfWeek.getDate() + (6 - endOfWeek.getDay()));
+//     try {
+//         const report = await getReport(startOfWeek, endOfWeek, user);
+//         res.status(200).json(report);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// }
+
 const getReportThisWeek = async (req, res) => {
     const { user } = req;
-    let startOfWeek = new Date();
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    let now = new Date();
+    let startOfWeek = new Date(now);
+    let endOfWeek = new Date(now);
 
-    let endOfWeek = new Date();
-    endOfWeek.setDate(endOfWeek.getDate() + (6 - endOfWeek.getDay()));
+    startOfWeek.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    endOfWeek.setDate(now.getDate() + (7 - now.getDay()) % 7);
+    endOfWeek.setHours(23, 59, 59, 999);
+
     try {
         const report = await getReport(startOfWeek, endOfWeek, user);
         res.status(200).json(report);
