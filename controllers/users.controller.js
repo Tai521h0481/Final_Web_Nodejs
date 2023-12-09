@@ -153,7 +153,6 @@ const login = async (req, res) => {
     Email = Email.toLowerCase();
     const user = await Users.findOneAndUpdate(
       { Username: Email, Password },
-      { IsOnline: true, FirstLogin: true },
       { new: true }
     )
       .select("-Password")
@@ -164,6 +163,8 @@ const login = async (req, res) => {
     else if(user.IsLocked === true) {
       return res.status(401).json({ message: "Your account has been locked" });
     }
+    user.IsOnline = true;
+    await user.save();
     const token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
     res.cookie("token", token, { maxAge: timeToken });
     res.status(200).json({ user, token });
@@ -210,6 +211,7 @@ const changePasswordByEmail = async (req, res) => {
     user.Password = Password;
     user.IsActive = true;
     user.FirstLogin = false;
+    user.IsOnline = true;
     await user.save();
     user.Password = undefined;
     token = jwt.sign({ data: user }, SECRET_key, { expiresIn });
