@@ -199,7 +199,7 @@ const getMonthlyOrderCounts = async (req, res) => {
             {
                 $group: {
                     _id: { $month: "$createdAt" },
-                    total: { $sum: 1 }
+                    total: { $sum: '$TotalAmount' }
                 }
             },
             {

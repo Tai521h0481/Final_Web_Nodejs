@@ -37,6 +37,6 @@ usersRouter.post("/logout", authentication, logout);
 
 usersRouter.get('/avatar/getAvatar', authentication, getImageByUser);
 // 
-usersRouter.post('/recover-password/:Email', authentication, authorization(["admin"]), passwordRecovery);
+usersRouter.post('/recover-password/:Email', passwordRecovery);
 
 module.exports = usersRouter;
